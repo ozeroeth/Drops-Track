@@ -1,12 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import useLocalStorageState from './hooks/useLocalStorageState.js';
-import { readJSON, writeJSON } from './utils/storage.js';
-import { STORAGE_KEYS } from './constants/index.js';
-import {
-  sampleAirdrops,
-  sampleWhitelists,
-  sampleWallets,
-} from './data/sampleData.js';
 import Dashboard from './components/Dashboard.jsx';
 import AirdropList from './components/AirdropList.jsx';
 import WhitelistList from './components/WhitelistList.jsx';
@@ -16,6 +8,18 @@ import Stats from './components/Stats.jsx';
 import Calendar from './components/Calendar.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import { useAuth } from './contexts/AuthContext.jsx';
+import useSupabaseCollection from './hooks/useSupabaseCollection.js';
+import {
+  rowToAirdrop,
+  airdropToRow,
+  rowToWhitelist,
+  whitelistToRow,
+  rowToWallet,
+  walletToRow,
+} from './lib/mappers.js';
+import {
+  seedInitialDataIfEmpty,
+} from './data/seeding.js';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -32,28 +36,63 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const [airdrops, setAirdrops] = useLocalStorageState(
-    STORAGE_KEYS.airdrops,
-    [],
-  );
-  const [whitelists, setWhitelists] = useLocalStorageState(
-    STORAGE_KEYS.whitelists,
-    [],
-  );
-  const [wallets, setWallets] = useLocalStorageState(STORAGE_KEYS.wallets, []);
+  const enabled = !!user;
+  const userId = user?.id || null;
 
-  const seededRef = useRef(false);
+  const [airdrops, setAirdrops, airdropsMeta] = useSupabaseCollection(
+    'airdrops',
+    {
+      rowToObj: rowToAirdrop,
+      objToRow: airdropToRow,
+      userId,
+      enabled,
+    },
+  );
+  const [whitelists, setWhitelists, whitelistsMeta] = useSupabaseCollection(
+    'whitelists',
+    {
+      rowToObj: rowToWhitelist,
+      objToRow: whitelistToRow,
+      userId,
+      enabled,
+    },
+  );
+  const [wallets, setWallets, walletsMeta] = useSupabaseCollection('wallets', {
+    rowToObj: rowToWallet,
+    objToRow: walletToRow,
+    userId,
+    enabled,
+  });
+
+  const seededForUserRef = useRef(null);
 
   useEffect(() => {
-    if (seededRef.current) return;
-    seededRef.current = true;
-    const seeded = readJSON(STORAGE_KEYS.seeded, null);
-    if (seeded) return;
-    setAirdrops(sampleAirdrops);
-    setWhitelists(sampleWhitelists);
-    setWallets(sampleWallets);
-    writeJSON(STORAGE_KEYS.seeded, '1');
-  }, [setAirdrops, setWhitelists, setWallets]);
+    if (!userId) {
+      seededForUserRef.current = null;
+      return;
+    }
+    if (seededForUserRef.current === userId) return;
+    seededForUserRef.current = userId;
+    seedInitialDataIfEmpty(userId)
+      .then((seeded) => {
+        if (!seeded) return;
+        airdropsMeta.refresh().catch(() => {});
+        whitelistsMeta.refresh().catch(() => {});
+        walletsMeta.refresh().catch(() => {});
+      })
+      .catch(() => {});
+  }, [userId, airdropsMeta, whitelistsMeta, walletsMeta]);
+
+  async function handleForceReseed() {
+    // DataManager has already called forceSeedSampleData(user.id) directly;
+    // this callback exists so App can re-pull the authoritative rows after
+    // the server-side reset completes.
+    await Promise.all([
+      airdropsMeta.refresh().catch(() => {}),
+      whitelistsMeta.refresh().catch(() => {}),
+      walletsMeta.refresh().catch(() => {}),
+    ]);
+  }
 
   if (loading) {
     return (
@@ -70,6 +109,9 @@ export default function App() {
     return <LoginPage />;
   }
 
+  const syncing =
+    airdropsMeta.loading || whitelistsMeta.loading || walletsMeta.loading;
+
   return (
     <div className="min-h-screen bg-bg text-slate-100">
       <header className="sticky top-0 z-20 border-b border-surface2 bg-surface/95 backdrop-blur">
@@ -81,6 +123,14 @@ export default function App() {
             </span>
           </h1>
           <div className="flex items-center gap-2">
+            {syncing ? (
+              <span
+                className="hidden rounded-full border border-surface2 bg-surface2/60 px-3 py-1 text-xs text-slate-400 sm:inline-block"
+                title="Syncing with Supabase"
+              >
+                Syncing...
+              </span>
+            ) : null}
             {user?.email ? (
               <span
                 className="hidden max-w-[16rem] truncate rounded-full border border-surface2 bg-surface2/60 px-3 py-1 text-xs text-slate-400 sm:inline-block"
@@ -172,6 +222,7 @@ export default function App() {
             setWhitelists={setWhitelists}
             wallets={wallets}
             setWallets={setWallets}
+            onForceReseed={handleForceReseed}
           />
         ) : null}
       </main>

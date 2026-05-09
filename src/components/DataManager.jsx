@@ -1,14 +1,9 @@
 import React, { useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import { exportToCSV, downloadCSV, parseCSV } from '../utils/csv.js';
-import { writeJSON, removeKey } from '../utils/storage.js';
-import { STORAGE_KEYS } from '../constants/index.js';
-import {
-  sampleAirdrops,
-  sampleWhitelists,
-  sampleWallets,
-} from '../data/sampleData.js';
 import { generateId } from '../utils/id.js';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { forceSeedSampleData } from '../data/seeding.js';
 
 const AIRDROP_HEADERS = [
   'id',
@@ -237,9 +232,12 @@ export default function DataManager({
   setWhitelists,
   wallets,
   setWallets,
+  onForceReseed,
 }) {
+  const { user } = useAuth();
   const [pendingImport, setPendingImport] = useState(null); // { kind, rows, fileName }
   const [pendingReset, setPendingReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [lastMessage, setLastMessage] = useState({
     airdrops: '',
     whitelists: '',
@@ -292,22 +290,35 @@ export default function DataManager({
     setPendingImport(null);
   }
 
-  function performReset() {
-    removeKey(STORAGE_KEYS.airdrops);
-    removeKey(STORAGE_KEYS.whitelists);
-    removeKey(STORAGE_KEYS.wallets);
-    removeKey(STORAGE_KEYS.seeded);
-    removeKey(STORAGE_KEYS.customNetworks);
-    setAirdrops(sampleAirdrops);
-    setWhitelists(sampleWhitelists);
-    setWallets(sampleWallets);
-    writeJSON(STORAGE_KEYS.seeded, '1');
-    setPendingReset(false);
-    setLastMessage({
-      airdrops: 'All data cleared and sample data reseeded.',
-      whitelists: '',
-      wallets: '',
-    });
+  async function performReset() {
+    if (resetting) return;
+    setResetting(true);
+    // Drop everything from local state first so the UI responds immediately.
+    setAirdrops([]);
+    setWhitelists([]);
+    setWallets([]);
+    try {
+      if (user?.id) {
+        await forceSeedSampleData(user.id);
+      }
+      if (typeof onForceReseed === 'function') {
+        await onForceReseed();
+      }
+      setLastMessage({
+        airdrops: 'All data cleared and sample data reseeded.',
+        whitelists: '',
+        wallets: '',
+      });
+    } catch (err) {
+      setLastMessage({
+        airdrops: `Reset failed: ${err && err.message ? err.message : 'unknown error'}`,
+        whitelists: '',
+        wallets: '',
+      });
+    } finally {
+      setPendingReset(false);
+      setResetting(false);
+    }
   }
 
   const pendingCount = pendingImport ? pendingImport.rows.length : 0;
@@ -340,15 +351,16 @@ export default function DataManager({
       <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4">
         <h3 className="text-sm font-semibold text-red-300">Danger zone</h3>
         <p className="mt-1 text-xs text-red-200/80">
-          Clear all locally stored DropTrack data and reseed the sample data.
-          This cannot be undone.
+          Clear all of your DropTrack data in Supabase and reseed the sample
+          data. This only affects your account and cannot be undone.
         </p>
         <button
           type="button"
           onClick={() => setPendingReset(true)}
-          className="mt-3 rounded-md border border-red-500/40 bg-red-600/80 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/60"
+          disabled={resetting}
+          className="mt-3 rounded-md border border-red-500/40 bg-red-600/80 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/60 disabled:opacity-50"
         >
-          Clear all data
+          {resetting ? 'Clearing...' : 'Clear all data'}
         </button>
       </div>
 
@@ -368,7 +380,7 @@ export default function DataManager({
       <ConfirmDialog
         open={pendingReset}
         title="Clear all data?"
-        body="This will wipe all airdrops, whitelists, wallets, and custom networks from localStorage and reseed the sample data."
+        body="This will wipe all of your airdrops, whitelists, and wallets in Supabase and reseed the sample data. Other users are unaffected."
         confirmLabel="Clear and reseed"
         onConfirm={performReset}
         onCancel={() => setPendingReset(false)}
