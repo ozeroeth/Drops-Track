@@ -89,7 +89,7 @@ DropTrack exports and imports a separate CSV file per collection. The first row 
 **Airdrops** (`airdrops.csv`)
 
 ```
-id, name, logoUrl, network, status, deadline, estimatedValueUsd, walletId, tasks, notes, link, createdAt
+id,name,logoUrl,network,status,deadline,estimatedValueUsd,walletId,tasks,notes,link,createdAt
 ```
 
 The `tasks` column is a JSON-encoded array of `{ id, label, done }` objects. Keep it verbatim on import, quotes and all, or the checklist will fail to parse.
@@ -97,20 +97,20 @@ The `tasks` column is a JSON-encoded array of `{ id, label, done }` objects. Kee
 **Whitelists** (`whitelists.csv`)
 
 ```
-id, name, type, status, applicationDeadline, mintDate, walletId, mintPrice, notes, link, createdAt
+id,name,type,status,applicationDeadline,mintDate,walletId,mintPrice,notes,link,createdAt
 ```
 
 **Wallets** (`wallets.csv`)
 
 ```
-id, label, address, chainType
+id,label,address,chainType
 ```
 
 Notes on importing:
 
 - Importing a CSV **replaces the entire collection** for that file. It does not merge with what is already there. Export first if you want a backup.
 - `walletId` values on airdrops and whitelists should match an `id` on the wallets file. Unknown ids still import, but the wallet label will not resolve in the UI.
-- Dates use ISO `YYYY-MM-DD`. `createdAt` is a full ISO timestamp.
+- Dates use ISO `YYYY-MM-DD`. `createdAt` is also `YYYY-MM-DD`.
 
 ## Deploy to Vercel (Step-by-Step)
 
