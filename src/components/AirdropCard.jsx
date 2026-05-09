@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import { isExpiringSoon, isPast } from '../utils/date.js';
@@ -42,6 +42,11 @@ export default function AirdropCard({
   onDelete,
   onToggleTask,
 }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  useEffect(() => {
+    setImgFailed(false);
+  }, [airdrop.logoUrl]);
+
   const overdue = isPast(airdrop.deadline) && airdrop.status === 'Active';
   const soon = isExpiringSoon(airdrop.deadline) && !overdue;
 
@@ -57,14 +62,12 @@ export default function AirdropCard({
     >
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          {airdrop.logoUrl ? (
+          {airdrop.logoUrl && !imgFailed ? (
             <img
               src={airdrop.logoUrl}
               alt=""
               className="h-10 w-10 flex-none rounded-full border border-surface2 object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
+              onError={() => setImgFailed(true)}
             />
           ) : (
             <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-surface2 bg-surface2 text-sm font-semibold text-slate-300">
