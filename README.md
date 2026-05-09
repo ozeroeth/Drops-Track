@@ -1,15 +1,15 @@
 # DropTrack
 
-A small, no-login, browser-only tracker for DeFi airdrops and NFT whitelist opportunities.
+A small personal tracker for DeFi airdrops and NFT whitelist opportunities, with login, Supabase-backed storage, and optional Telegram deadline notifications.
 
 ## Overview
 
-DropTrack is a personal productivity tool for keeping tabs on DeFi/NFT airdrops and whitelist opportunities. It runs entirely in your browser and stores everything in `localStorage`, so there is no backend, no account, and no signup. You open the page, you get a dashboard, you add entries, and your data stays on your machine.
-
-On first open, DropTrack seeds a handful of realistic sample airdrops, whitelists, and wallets so the dashboard is not empty while you learn the UI. Delete them whenever you're ready to use your own data. Export to CSV any time you want a backup you can keep outside the browser.
+DropTrack is a personal productivity tool for keeping tabs on DeFi/NFT airdrops and whitelist opportunities. You sign in with Google or an email/password, and your entries sync to Supabase Postgres under Row Level Security, so only you can see them. On first login, DropTrack seeds a handful of realistic sample airdrops, whitelists, and wallets so the dashboard is not empty while you learn the UI. Delete them whenever you're ready to use your own data. Export to CSV any time you want a backup you can keep outside the database.
 
 ## Features
 
+- Login with Google or email/password (Supabase Auth). Each user sees only their own data via Postgres RLS.
+- Optional Telegram deadline notifications: set your chat ID on the Settings page and an edge function will DM you N days before each deadline.
 - Airdrop tracker with status, network, deadline, estimated value, per-task checklist, linked wallet, notes, and link.
 - Whitelist tracker for NFT mints, token sales, and beta access, with application deadline and mint date.
 - Dashboard overview with summary counts and deadline alerts (entries due within 3 days are highlighted).
@@ -28,9 +28,98 @@ On first open, DropTrack seeds a handful of realistic sample airdrops, whitelist
 - React 18
 - Vite 5
 - Tailwind CSS 3
-- Browser `localStorage` for persistence
+- Supabase (Postgres, Auth, Edge Functions) for data, login, and scheduled Telegram notifications
 
-No backend. No accounts. Your data never leaves your browser.
+## Supabase Setup
+
+DropTrack needs a Supabase project for authentication, data storage, and the Telegram notification edge functions. The steps below cover the full one-time setup.
+
+### 1. Create a Supabase project
+
+1. Sign up at [supabase.com](https://supabase.com/) and create a new project.
+2. In **Project Settings > API**, copy the **Project URL** and the **anon / publishable** key. You'll paste them into `.env` in the next step.
+
+### 2. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in:
+
+```
+VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<anon-key>
+```
+
+The app throws at startup if either value is missing. Restart `npm run dev` after editing `.env` so Vite picks up the new values.
+
+### 3. Run the SQL migration
+
+The migration at `supabase/migrations/20250109120000_init.sql` creates the `airdrops`, `whitelists`, `wallets`, and `user_settings` tables, enables Row Level Security, installs the `auth.uid() = user_id` policies, and adds helpful indexes.
+
+**SQL Editor path:** open the Supabase Dashboard, go to **SQL Editor**, paste the contents of `supabase/migrations/20250109120000_init.sql`, and click **Run**.
+
+**CLI path:**
+
+```bash
+supabase link --project-ref <your-project-ref>
+supabase db push
+```
+
+### 4. Enable Google OAuth
+
+1. In the Supabase Dashboard, go to **Authentication > Providers > Google** and toggle it on. Note the callback URL Supabase displays, something like `https://<your-project-ref>.supabase.co/auth/v1/callback`.
+2. In the [Google Cloud Console](https://console.cloud.google.com/), create (or reuse) a project, enable the **OAuth consent screen**, and under **APIs & Services > Credentials**, click **Create Credentials > OAuth client ID**.
+3. Pick **Web application**. For **Authorized JavaScript origins**, add `http://localhost:5173` (for local dev) and your deployed origin (e.g. `https://your-app.vercel.app`). For **Authorized redirect URIs**, paste the Supabase callback URL from step 1 **exactly**.
+4. Copy the generated **Client ID** and **Client Secret** back into the Supabase Google provider settings and save.
+
+Email/password login is enabled out of the box; there is nothing extra to configure for it.
+
+### 5. Deploy the Edge Functions
+
+Both functions live under `supabase/functions/`. Deploy them with the Supabase CLI:
+
+```bash
+supabase functions deploy check-deadlines
+supabase functions deploy send-test-notification
+```
+
+### 6. Set Edge Function secrets
+
+The functions need two secrets. `SUPABASE_URL` and `SUPABASE_ANON_KEY` are injected automatically by the platform, so you do not set those yourself.
+
+```bash
+supabase secrets set TELEGRAM_BOT_TOKEN=<your-bot-http-api-token>
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<service-role-key-from-project-settings>
+```
+
+You can find the service role key under **Project Settings > API > service_role secret**. Treat it like a password, it bypasses RLS.
+
+### 7. Schedule `check-deadlines`
+
+In the Supabase Dashboard, open **Database > Cron Jobs** and create a new job that invokes the `check-deadlines` edge function over HTTP. A sensible default is once a day:
+
+```
+0 9 * * *
+```
+
+That runs at 09:00 UTC daily. Date comparisons inside the function happen in UTC, so users in non-UTC timezones may see a +/- 1 day shift relative to their local calendar.
+
+### 8. Telegram bot setup
+
+1. Open Telegram and message **@BotFather**. Send `/newbot`, pick a name and a `@username`, and note the HTTP API token BotFather hands back. That token is the `TELEGRAM_BOT_TOKEN` you stored in step 6.
+2. Each user then messages the bot with `/start`. Their chat id can be found a few ways:
+   - Visit `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser after messaging the bot, and read `result[].message.chat.id`.
+   - Or DM **@userinfobot** which replies with your numeric chat id.
+3. On the DropTrack **Settings** page, paste the chat id, pick a days-before value, toggle **Enable deadline notifications**, click **Save**, then **Send test notification** to confirm the bot can reach you.
+
+### Troubleshooting
+
+- **Login button does nothing.** Check that `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are set in `.env`, and that you restarted the dev server after editing `.env`. Vite only reads env files at startup.
+- **OAuth redirect 404 / `redirect_uri_mismatch`.** The **Authorized redirect URI** in the Google Cloud Console must match the callback URL shown by Supabase exactly, character for character, including the trailing path.
+- **No Telegram messages after the cron fires.** Confirm `TELEGRAM_BOT_TOKEN` is set (`supabase secrets list`), the cron job is enabled in Supabase Dashboard > Database > Cron Jobs, and the user actually has `notify_enabled = true` and a non-null `telegram_chat_id` in `user_settings`. Check the function logs under **Edge Functions > check-deadlines > Logs** for per-row errors.
+- **`Send test notification` returns `No Telegram chat ID configured`.** The user has not yet saved a chat id. Enter one in the Settings page and click **Save** first, then retry the test.
 
 ## Local Development
 
@@ -74,19 +163,16 @@ To build a production bundle locally, run `npm run build` (output goes to `dist/
 
 ## Data & Privacy
 
-Everything DropTrack knows about you lives in your browser's `localStorage`, under these five keys:
+Your airdrops, whitelists, wallets, and notification settings live in a Supabase Postgres database under **Row Level Security**. Every table has `auth.uid() = user_id` policies on select/insert/update/delete, so even with a shared database, each user only ever sees their own rows.
 
-- `droptrack.airdrops` - the list of airdrop entries
-- `droptrack.whitelists` - the list of whitelist entries
-- `droptrack.wallets` - the list of wallets
-- `droptrack.seeded` - a flag that records whether sample data has been seeded, so it is only seeded once
-- `droptrack.customNetworks` - the list of user-added custom network labels (populated when you pick **Custom...** in the Network dropdown on the Airdrop form, and surfaced back in that dropdown with a pencil marker on later visits)
+One preference remains on the device: `droptrack.customNetworks` in `localStorage`, the list of user-added custom network labels (populated when you pick **Custom...** in the Network dropdown on the Airdrop form, and surfaced back in that dropdown with a pencil marker on later visits). It is not synced across browsers by design.
 
 Things to know:
 
-- Clearing your browser data, using private/incognito mode, or switching browsers will wipe your DropTrack data. There is no cloud copy.
-- Use the Data tab's **Export CSV** buttons to keep a backup outside the browser.
-- Nothing is ever sent over the network. No analytics, no sync, no telemetry.
+- Use the Data tab's **Export CSV** buttons to keep an offline backup outside the database. CSV export is still the recommended belt-and-suspenders backup.
+- When you sign out, the app simply drops your session; your rows stay in Supabase and come back on your next login.
+- If your Supabase project is paused or deleted, your DropTrack data goes with it. Keep an occasional CSV export if the data matters.
+- No analytics or telemetry. The only outbound traffic is to Supabase (your project) and, if you opt in, to the Telegram Bot API via the edge function.
 
 ## CSV Import / Export Format
 
@@ -117,7 +203,7 @@ id,label,address,chainType
 Notes on importing:
 
 - Importing a CSV **replaces the entire collection** for that file. It does not merge with what is already there. Export first if you want a backup.
-- `walletId` values on airdrops and whitelists should match an `id` on the wallets file. Unknown ids still import, but the wallet label will not resolve in the UI.
+- `walletId` values on airdrops and whitelists should match an `id` on the wallets file. After the Supabase migration these ids are UUIDs, but the app treats them as opaque strings, so older CSVs with `seed-wallet-*` ids still import. Unknown ids still import, but the wallet label will not resolve in the UI.
 - Dates use ISO `YYYY-MM-DD`. `createdAt` is also `YYYY-MM-DD`.
 
 ## Deploy to Vercel (Step-by-Step)
@@ -144,7 +230,7 @@ Written for someone who has never deployed a site before. Follow the steps in or
    - Build Command: `npm run build`
    - Output Directory: `dist`
    - Install Command: `npm install`
-8. **Click Deploy.** Leave environment variables empty (DropTrack does not need any).
+8. **Click Deploy.** Under **Environment Variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` with the same values you put in your local `.env` (the app throws at startup if they're missing).
 9. **Wait about a minute.** Vercel will install, build, and deploy. When it finishes you'll get a public URL that looks like `https://your-project.vercel.app`. Open it and DropTrack should load.
 10. **Push to deploy updates.** From now on, any time you run `git push` to the `main` branch, Vercel automatically rebuilds and redeploys. No dashboard clicks required.
 
@@ -161,15 +247,16 @@ If you prefer Netlify, the flow is similar.
 5. Confirm the build settings:
    - Build command: `npm run build`
    - Publish directory: `dist`
-6. Click **Deploy**. Netlify also auto-rebuilds on every push to `main`.
+6. Under **Site settings > Environment variables**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+7. Click **Deploy**. Netlify also auto-rebuilds on every push to `main`.
 
 ## Troubleshooting
 
 - **`npm install` fails.** Make sure you're on Node.js 18 or newer. Run `node --version` to check. Older Node versions cannot install the packages this project uses.
 - **Page is blank after deploy.** Double-check that the Output Directory is `dist`, not `build`. Vite writes to `dist/` by default.
-- **My data disappeared.** Clearing browser data, using private/incognito mode, or switching browsers wipes `localStorage`. There is no server-side copy. Use the Data tab's Export CSV buttons to keep backups.
+- **My data disappeared.** Your data lives in Supabase, not the browser, so clearing browser data only logs you out. Sign back in to restore it. If you also lost data from the Supabase project (e.g. the project was paused, deleted, or a CSV import replaced a collection), restore from your latest CSV export via the Data tab.
 - **Tailwind classes are not applying.** Confirm `tailwind.config.js` has `content: ['./index.html', './src/**/*.{js,jsx}']`. If the glob does not include your files, Tailwind will strip the classes from the production build.
-- **Sample data keeps coming back.** Sample data only seeds when `droptrack.seeded` is missing from `localStorage`. If you cleared everything and it seeded again, that's expected. Delete the entries you don't want and DropTrack will remember.
+- **Sample data keeps coming back.** Sample data only seeds for a freshly signed-in user whose `airdrops` / `whitelists` / `wallets` tables are all empty. If you cleared everything by emptying those tables, that's expected. Delete the entries you don't want and they stay deleted.
 
 ## License
 

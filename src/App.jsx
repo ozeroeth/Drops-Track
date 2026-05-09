@@ -7,6 +7,7 @@ import DataManager from './components/DataManager.jsx';
 import Stats from './components/Stats.jsx';
 import Calendar from './components/Calendar.jsx';
 import LoginPage from './components/LoginPage.jsx';
+import SettingsPage from './components/SettingsPage.jsx';
 import { useAuth } from './contexts/AuthContext.jsx';
 import useSupabaseCollection from './hooks/useSupabaseCollection.js';
 import {
@@ -28,6 +29,7 @@ const TABS = [
   { id: 'calendar', label: 'Calendar' },
   { id: 'stats', label: 'Stats' },
   { id: 'wallets', label: 'Wallets' },
+  { id: 'settings', label: 'Settings' },
   { id: 'data', label: 'Data' },
 ];
 
@@ -214,6 +216,7 @@ export default function App() {
             whitelists={whitelists}
           />
         ) : null}
+        {activeTab === 'settings' ? <SettingsPage /> : null}
         {activeTab === 'data' ? (
           <DataManager
             airdrops={airdrops}
