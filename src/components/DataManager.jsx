@@ -19,6 +19,7 @@ const AIRDROP_HEADERS = [
   'link',
   'createdAt',
   'tags',
+  'twitterUrl',
 ];
 
 const WHITELIST_HEADERS = [
@@ -34,6 +35,7 @@ const WHITELIST_HEADERS = [
   'link',
   'createdAt',
   'tags',
+  'twitterUrl',
 ];
 
 const WALLET_HEADERS = ['id', 'label', 'address', 'chainType'];
@@ -64,6 +66,7 @@ function serializeAirdrop(a) {
     link: a.link || '',
     createdAt: a.createdAt || '',
     tags: JSON.stringify(Array.isArray(a.tags) ? a.tags : []),
+    twitterUrl: a.twitterUrl || '',
   };
 }
 
@@ -81,6 +84,7 @@ function serializeWhitelist(w) {
     link: w.link || '',
     createdAt: w.createdAt || '',
     tags: JSON.stringify(Array.isArray(w.tags) ? w.tags : []),
+    twitterUrl: w.twitterUrl || '',
   };
 }
 
@@ -141,6 +145,7 @@ function normalizeAirdropRow(row) {
     tags: parseTagsField(row.tags),
     notes: row.notes || '',
     link: row.link || '',
+    twitterUrl: row.twitterUrl || '',
     createdAt: row.createdAt || '',
   };
 }
@@ -158,6 +163,7 @@ function normalizeWhitelistRow(row) {
     tags: parseTagsField(row.tags),
     notes: row.notes || '',
     link: row.link || '',
+    twitterUrl: row.twitterUrl || '',
     createdAt: row.createdAt || '',
   };
 }

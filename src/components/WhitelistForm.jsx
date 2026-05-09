@@ -18,6 +18,7 @@ function emptyEntry() {
     tags: [],
     notes: '',
     link: '',
+    twitterUrl: '',
     createdAt: '',
   };
 }
@@ -38,6 +39,7 @@ function fromInitial(initial) {
       : [],
     notes: initial.notes || '',
     link: initial.link || '',
+    twitterUrl: initial.twitterUrl || '',
     createdAt: initial.createdAt || '',
   };
 }
@@ -76,6 +78,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
       tags: Array.isArray(form.tags) ? form.tags.slice() : [],
       notes: form.notes,
       link: form.link.trim(),
+      twitterUrl: form.twitterUrl.trim(),
       createdAt: form.createdAt || now,
     };
     onSubmit(entry);
@@ -234,6 +237,22 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             type="url"
             value={form.link}
             onChange={(e) => update('link', e.target.value)}
+            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-twitter">
+            <span className="inline-flex items-center gap-1.5">
+              <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>&#x1D54F;</span> Twitter/X
+            </span>
+          </label>
+          <input
+            id="wf-twitter"
+            type="url"
+            value={form.twitterUrl}
+            onChange={(e) => update('twitterUrl', e.target.value)}
+            placeholder="https://x.com/..."
             className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
           />
         </div>

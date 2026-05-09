@@ -44,6 +44,7 @@ export function rowToAirdrop(row) {
     notes: row.notes || '',
     link: row.link || '',
     tags: ensureArray(row.tags),
+    twitterUrl: row.twitter_url || '',
     createdAt: row.created_at || '',
   };
 }
@@ -80,6 +81,7 @@ export function airdropToRow(obj, userId, resolveWalletId) {
     notes: obj.notes || null,
     link: obj.link || null,
     tags: ensureArray(obj.tags),
+    twitter_url: obj.twitterUrl || null,
   };
   if (isUuid(obj.id)) row.id = obj.id;
   if (obj.createdAt) row.created_at = obj.createdAt;
@@ -102,6 +104,7 @@ export function rowToWhitelist(row) {
     notes: row.notes || '',
     link: row.link || '',
     tags: ensureArray(row.tags),
+    twitterUrl: row.twitter_url || '',
     createdAt: row.created_at || '',
   };
 }
@@ -125,6 +128,7 @@ export function whitelistToRow(obj, userId, resolveWalletId) {
     notes: obj.notes || null,
     link: obj.link || null,
     tags: ensureArray(obj.tags),
+    twitter_url: obj.twitterUrl || null,
   };
   if (isUuid(obj.id)) row.id = obj.id;
   if (obj.createdAt) row.created_at = obj.createdAt;

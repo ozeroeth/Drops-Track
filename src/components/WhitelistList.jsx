@@ -146,6 +146,7 @@ export default function WhitelistList({ whitelists, setWhitelists, wallets }) {
       tags: Array.isArray(source.tags) ? source.tags.slice() : [],
       notes: source.notes || '',
       link: source.link || '',
+      twitterUrl: source.twitterUrl || '',
       createdAt: now,
     };
     setWhitelists((prev) => [dup, ...prev]);

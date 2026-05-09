@@ -130,15 +130,29 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
         </p>
       ) : null}
 
-      {whitelist.link ? (
-        <a
-          href={whitelist.link}
-          target="_blank"
-          rel="noreferrer"
-          className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none"
-        >
-          Open official site
-        </a>
+      {(whitelist.link || whitelist.twitterUrl) ? (
+        <div className="flex flex-wrap items-center gap-3">
+          {whitelist.link ? (
+            <a
+              href={whitelist.link}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none"
+            >
+              Open official site
+            </a>
+          ) : null}
+          {whitelist.twitterUrl ? (
+            <a
+              href={whitelist.twitterUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-medium text-textSecondary hover:text-white focus:outline-none"
+            >
+              <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>{'\u{1D54F}'}</span> Twitter/X
+            </a>
+          ) : null}
+        </div>
       ) : null}
     </article>
   );

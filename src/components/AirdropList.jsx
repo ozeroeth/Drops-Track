@@ -196,6 +196,7 @@ export default function AirdropList({ airdrops, setAirdrops, wallets }) {
       tags: Array.isArray(source.tags) ? source.tags.slice() : [],
       notes: source.notes || '',
       link: source.link || '',
+      twitterUrl: source.twitterUrl || '',
       createdAt: now,
     };
     setAirdrops((prev) => [dup, ...prev]);

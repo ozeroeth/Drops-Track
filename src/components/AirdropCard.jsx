@@ -221,15 +221,29 @@ export default function AirdropCard({
         </ul>
       ) : null}
 
-      {airdrop.link ? (
-        <a
-          href={airdrop.link}
-          target="_blank"
-          rel="noreferrer"
-          className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none"
-        >
-          Open official site
-        </a>
+      {(airdrop.link || airdrop.twitterUrl) ? (
+        <div className="flex flex-wrap items-center gap-3">
+          {airdrop.link ? (
+            <a
+              href={airdrop.link}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none"
+            >
+              Open official site
+            </a>
+          ) : null}
+          {airdrop.twitterUrl ? (
+            <a
+              href={airdrop.twitterUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-medium text-textSecondary hover:text-white focus:outline-none"
+            >
+              <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>{'\u{1D54F}'}</span> Twitter/X
+            </a>
+          ) : null}
+        </div>
       ) : null}
     </article>
   );
