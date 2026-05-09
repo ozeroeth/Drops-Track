@@ -8,6 +8,7 @@ import Stats from './components/Stats.jsx';
 import Calendar from './components/Calendar.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import SettingsPage from './components/SettingsPage.jsx';
+import BackgroundDecoration from './components/BackgroundDecoration.jsx';
 import { useAuth } from './contexts/AuthContext.jsx';
 import useSupabaseCollection from './hooks/useSupabaseCollection.js';
 import {
@@ -23,14 +24,14 @@ import {
 } from './data/seeding.js';
 
 const TABS = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'airdrops', label: 'Airdrops' },
-  { id: 'whitelists', label: 'Whitelists' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'stats', label: 'Stats' },
-  { id: 'wallets', label: 'Wallets' },
-  { id: 'settings', label: 'Settings' },
-  { id: 'data', label: 'Data' },
+  { id: 'dashboard', label: 'Dashboard', icon: '\u{1F4CA}' },
+  { id: 'airdrops', label: 'Airdrops', icon: '\u{1FA82}' },
+  { id: 'whitelists', label: 'Whitelists', icon: '\u{1F4CB}' },
+  { id: 'calendar', label: 'Calendar', icon: '\u{1F4C5}' },
+  { id: 'stats', label: 'Stats', icon: '\u{1F4C8}' },
+  { id: 'wallets', label: 'Wallets', icon: '\u{1F45B}' },
+  { id: 'settings', label: 'Settings', icon: '\u2699\uFE0F' },
+  { id: 'data', label: 'Data', icon: '\u{1F4BE}' },
 ];
 
 export default function App() {
@@ -116,7 +117,7 @@ export default function App() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg text-slate-300">
         <div className="flex items-center gap-3 text-sm">
-          <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-accent-400" />
+          <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-primary" />
           <span>Loading DropTrack...</span>
         </div>
       </div>
@@ -131,19 +132,28 @@ export default function App() {
     airdropsMeta.loading || whitelistsMeta.loading || walletsMeta.loading;
 
   return (
-    <div className="min-h-screen bg-bg text-slate-100">
-      <header className="sticky top-0 z-20 border-b border-surface2 bg-surface/95 backdrop-blur">
+    <div className="relative min-h-screen text-slate-100">
+      <BackgroundDecoration />
+      <header
+        className="sticky top-0 z-20"
+        style={{
+          background: 'transparent',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4">
-          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-accent-400" />
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight font-heading">
+            <span className="text-primary">&#9670;</span>
             <span>
-              <span className="text-accent-400">Drop</span>Track
+              <span className="text-primary">Drop</span><span className="text-white">Track</span>
             </span>
           </h1>
           <div className="flex items-center gap-2">
             {syncing ? (
               <span
-                className="hidden rounded-full border border-surface2 bg-surface2/60 px-3 py-1 text-xs text-slate-400 sm:inline-block"
+                className="hidden rounded-full border border-[rgba(255,255,255,0.12)] px-3 py-1 text-xs text-textSecondary sm:inline-block"
                 title="Syncing with Supabase"
               >
                 Syncing...
@@ -151,7 +161,7 @@ export default function App() {
             ) : null}
             {user?.email ? (
               <span
-                className="hidden max-w-[16rem] truncate rounded-full border border-surface2 bg-surface2/60 px-3 py-1 text-xs text-slate-400 sm:inline-block"
+                className="hidden max-w-[16rem] truncate rounded-full border border-[rgba(255,255,255,0.12)] px-3 py-1 text-xs text-textSecondary sm:inline-block"
                 title={user.email}
               >
                 {user.email}
@@ -160,14 +170,15 @@ export default function App() {
             <button
               type="button"
               onClick={() => signOut()}
-              className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-surface2/70 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="rounded-md border border-[rgba(255,255,255,0.12)] bg-transparent px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:border-[rgba(255,255,255,0.3)] hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
             >
               Sign out
             </button>
           </div>
         </div>
+        {/* Desktop navigation */}
         <nav
-          className="mx-auto flex max-w-6xl gap-1 overflow-x-auto whitespace-nowrap px-4 pb-3"
+          className="mx-auto hidden max-w-6xl gap-1 overflow-x-auto whitespace-nowrap px-4 pb-3 sm:flex"
           aria-label="Primary"
         >
           {TABS.map((tab) => {
@@ -179,10 +190,10 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
                 className={
-                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500/40 ' +
+                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 ' +
                   (isActive
-                    ? 'bg-accent-500 text-slate-900'
-                    : 'text-slate-300 hover:bg-surface2 hover:text-slate-100')
+                    ? 'text-primary'
+                    : 'text-textSecondary hover:text-white')
                 }
               >
                 {tab.label}
@@ -191,7 +202,49 @@ export default function App() {
           })}
         </nav>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">
+
+      {/* Mobile bottom navigation */}
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around px-1 py-2 sm:hidden"
+        style={{
+          background: 'rgba(8,11,20,0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
+        aria-label="Primary"
+      >
+        {TABS.map((tab) => {
+          const isActive = tab.id === activeTab;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              aria-current={isActive ? 'page' : undefined}
+              className="flex flex-col items-center gap-0.5 px-1 py-1 focus:outline-none"
+            >
+              <span className="text-base leading-none">{tab.icon}</span>
+              <span
+                className={
+                  'text-[10px] leading-tight transition-colors ' +
+                  (isActive ? 'text-primary' : 'text-textSecondary')
+                }
+              >
+                {tab.label}
+              </span>
+              {isActive ? (
+                <span className="mt-0.5 h-1 w-1 rounded-full" style={{ background: '#F7931A' }} />
+              ) : null}
+            </button>
+          );
+        })}
+      </nav>
+
+      <main
+        key={activeTab}
+        className="relative z-10 mx-auto max-w-6xl px-4 py-6 pb-24 sm:pb-6 animate-fade-in-up"
+      >
         {activeTab === 'dashboard' ? (
           <Dashboard
             airdrops={airdrops}

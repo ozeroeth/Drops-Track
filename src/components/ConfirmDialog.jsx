@@ -19,14 +19,21 @@ export default function ConfirmDialog({
             type="button"
             onClick={onCancel}
             autoFocus
-            className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-md border border-[rgba(255,255,255,0.12)] bg-transparent px-3 py-1.5 text-sm text-textSecondary transition-colors hover:border-[rgba(255,255,255,0.3)] hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="rounded-md border border-red-500/40 bg-red-600/90 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/60"
+            className="rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-danger/40"
+            style={{
+              background: 'rgba(255,71,87,0.1)',
+              border: '1px solid rgba(255,71,87,0.3)',
+              color: '#FF4757',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,71,87,0.2)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,71,87,0.1)'; }}
           >
             {confirmLabel}
           </button>

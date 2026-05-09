@@ -8,6 +8,11 @@ import {
 
 const CUSTOM_SENTINEL = '__custom__';
 
+const inputStyle = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+};
+
 export default function NetworkSelect({ id, value, onChange }) {
   const [customList, setCustomList] = useState(() => loadCustomNetworks());
   const [draft, setDraft] = useState('');
@@ -83,13 +88,26 @@ export default function NetworkSelect({ id, value, onChange }) {
       ? value
       : null;
 
+  function handleFocus(e) {
+    e.currentTarget.style.borderColor = '#F7931A';
+    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(247,147,26,0.1)';
+  }
+
+  function handleBlur(e) {
+    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+    e.currentTarget.style.boxShadow = 'none';
+  }
+
   return (
     <div className="space-y-2">
       <select
         id={id}
         value={selectValue || ''}
         onChange={handleSelectChange}
-        className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+        className="mt-1 w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none"
+        style={inputStyle}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       >
         {NETWORKS.map((n) => (
           <option key={n.id} value={n.id}>
@@ -117,12 +135,18 @@ export default function NetworkSelect({ id, value, onChange }) {
             onKeyDown={handleDraftKeyDown}
             placeholder="e.g. Berachain"
             autoFocus
-            className="flex-1 rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="flex-1 rounded-[10px] px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:outline-none"
+            style={inputStyle}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
           />
           <button
             type="button"
             onClick={commitDraft}
-            className="rounded-md border border-accent-500/40 bg-accent-500/20 px-2 py-1 text-xs font-medium text-accent-200 hover:bg-accent-500/30 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-[10px] px-2 py-1 text-xs font-medium text-white transition-colors hover:shadow-[0_0_10px_rgba(247,147,26,0.2)] focus:outline-none focus:ring-2 focus:ring-primary/40"
+            style={{
+              background: 'linear-gradient(135deg, #F7931A, #E8820A)',
+            }}
           >
             Add
           </button>
@@ -132,7 +156,7 @@ export default function NetworkSelect({ id, value, onChange }) {
               setShowDraft(false);
               setDraft('');
             }}
-            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-transparent px-2 py-1 text-xs text-textSecondary transition-colors hover:border-[rgba(255,255,255,0.3)] hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             Cancel
           </button>

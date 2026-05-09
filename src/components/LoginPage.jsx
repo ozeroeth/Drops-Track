@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import BackgroundDecoration from './BackgroundDecoration.jsx';
 
 export default function LoginPage() {
   const {
@@ -103,17 +104,26 @@ export default function LoginPage() {
   const submitLabel = mode === 'login' ? 'Log in' : 'Sign up';
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4 py-10 text-slate-100">
-      <div className="w-full max-w-md rounded-lg border border-surface2 bg-surface p-6 shadow-xl">
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-10">
+      <BackgroundDecoration />
+      <div
+        className="relative z-10 w-full max-w-[420px] rounded-2xl p-8"
+        style={{
+          background: 'rgba(13,17,23,0.85)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+        }}
+      >
         <div className="mb-6 flex flex-col items-center text-center">
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-accent-400" />
+          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight font-heading">
+            <span className="text-primary">&#9670;</span>
             <span>
-              <span className="text-accent-400">Drop</span>Track
+              <span className="text-primary">Drop</span><span className="text-white">Track</span>
             </span>
           </h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Track your DeFi airdrops and NFT whitelists in one place.
+          <p className="mt-2 text-sm text-textSecondary">
+            Track your airdrops. Never miss a drop.
           </p>
         </div>
 
@@ -121,15 +131,18 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogle}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-accent-500 px-3 py-2 text-sm font-semibold text-slate-900 transition-colors hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-[0_0_20px_rgba(247,147,26,0.3)] focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+          style={{
+            background: 'linear-gradient(135deg, #F7931A, #E8820A)',
+          }}
         >
           Continue with Google
         </button>
 
-        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-500">
-          <span className="h-px flex-1 bg-surface2" />
-          <span>or</span>
-          <span className="h-px flex-1 bg-surface2" />
+        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-textSecondary">
+          <span className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <span>or continue with</span>
+          <span className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -146,7 +159,11 @@ export default function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="w-full rounded-[10px] px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-primary/40"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
               required
             />
           </div>
@@ -165,19 +182,23 @@ export default function LoginPage() {
               }
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="w-full rounded-[10px] px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-primary/40"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
               required
               minLength={6}
             />
           </div>
 
           {errorMsg ? (
-            <p className="text-sm text-red-400" role="alert">
+            <p className="text-sm text-danger" role="alert">
               {errorMsg}
             </p>
           ) : null}
           {infoMsg ? (
-            <p className="text-sm text-accent-400" role="status">
+            <p className="text-sm text-primary" role="status">
               {infoMsg}
             </p>
           ) : null}
@@ -185,17 +206,21 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-md border border-surface2 bg-surface2 px-3 py-2 text-sm font-semibold text-slate-100 transition-colors hover:bg-surface2/70 focus:outline-none focus:ring-2 focus:ring-accent-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-[10px] px-3 py-2 text-sm font-semibold text-white transition-colors hover:border-[rgba(255,255,255,0.2)] focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.12)',
+            }}
           >
             {busy ? 'Please wait...' : submitLabel}
           </button>
         </form>
 
-        <div className="mt-4 flex flex-col items-center gap-2 text-xs text-slate-400">
+        <div className="mt-4 flex flex-col items-center gap-2 text-xs text-textSecondary">
           <button
             type="button"
             onClick={toggleMode}
-            className="text-slate-300 hover:text-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="text-slate-300 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             {mode === 'login'
               ? "Don't have an account? Sign up"
@@ -204,11 +229,15 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleForgotPassword}
-            className="text-slate-400 hover:text-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="text-textSecondary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             Forgot password?
           </button>
         </div>
+
+        <p className="mt-6 text-center text-xs text-textSecondary">
+          Powered by Supabase
+        </p>
       </div>
     </div>
   );

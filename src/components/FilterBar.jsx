@@ -1,14 +1,28 @@
 import React from 'react';
 
+const selectStyle = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+};
+
 function Select({ value, onChange, options, label }) {
   return (
-    <label className="flex items-center gap-2 text-xs text-slate-400">
+    <label className="flex items-center gap-2 text-xs text-textSecondary">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
-        className="rounded-md border border-surface2 bg-surface px-2 py-1.5 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+        className="rounded-[10px] px-2 py-1.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+        style={selectStyle}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = '#F7931A';
+          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(247,147,26,0.1)';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -82,7 +96,7 @@ export default function FilterBar({ filters, setFilters, options, defaults }) {
         <button
           type="button"
           onClick={clearAll}
-          className="rounded-md border border-surface2 bg-surface px-2 py-1.5 text-xs text-slate-300 hover:bg-surface2 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-transparent px-2 py-1.5 text-xs text-textSecondary transition-colors hover:border-[rgba(255,255,255,0.3)] hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
         >
           Clear filters
         </button>
