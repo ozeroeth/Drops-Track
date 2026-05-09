@@ -144,7 +144,7 @@ serve(async (req) => {
           .select('*')
           .eq('user_id', userId)
           .eq('deadline', targetISO)
-          .eq('status', 'Active');
+          .in('status', ['Active', 'Pending']);
         if (airdropErr) {
           errors.push(
             `airdrops lookup failed for user ${userId}: ${airdropErr.message}`,
@@ -179,84 +179,86 @@ serve(async (req) => {
           }
         }
 
-        const { data: whitelistApplyRows, error: whitelistApplyErr } =
-          await admin
-            .from('whitelists')
-            .select('*')
-            .eq('user_id', userId)
-            .eq('application_deadline', targetISO)
-            .eq('status', 'Applied');
-        if (whitelistApplyErr) {
+        // Whitelists can match on either application_deadline or mint_date.
+        // A single row whose application_deadline == mint_date == target
+        // would otherwise receive two Telegram messages (one from each
+        // query). We union both result sets, deduplicate by row id, and
+        // send one message per row. If a row matches both date fields we
+        // prefer the application-deadline message, which is the earlier
+        // semantic milestone.
+        const whitelistApply = await admin
+          .from('whitelists')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('application_deadline', targetISO)
+          .eq('status', 'Applied');
+        if (whitelistApply.error) {
           errors.push(
-            `whitelists(application) lookup failed for user ${userId}: ${whitelistApplyErr.message}`,
+            `whitelists(application) lookup failed for user ${userId}: ${whitelistApply.error.message}`,
           );
-        } else {
-          for (const row of whitelistApplyRows || []) {
-            try {
-              const text = buildMessage({
-                name: row.name,
-                date: row.application_deadline,
-                daysLeft: daysBefore,
-                network: row.type,
-                value: row.mint_price,
-              });
-              const { ok, body } = await sendTelegram(
-                TELEGRAM_BOT_TOKEN,
-                chatId,
-                text,
-              );
-              if (ok) {
-                messagesSent++;
-              } else {
-                errors.push(
-                  `telegram sendMessage failed for whitelist(application) ${row.id}: ${body}`,
-                );
-              }
-            } catch (e) {
-              errors.push(
-                `whitelist ${row.id} application notification threw: ${(e as Error).message}`,
-              );
-            }
-          }
         }
 
-        const { data: whitelistMintRows, error: whitelistMintErr } = await admin
+        const whitelistMint = await admin
           .from('whitelists')
           .select('*')
           .eq('user_id', userId)
           .eq('mint_date', targetISO)
           .in('status', ['Applied', 'Whitelisted']);
-        if (whitelistMintErr) {
+        if (whitelistMint.error) {
           errors.push(
-            `whitelists(mint) lookup failed for user ${userId}: ${whitelistMintErr.message}`,
+            `whitelists(mint) lookup failed for user ${userId}: ${whitelistMint.error.message}`,
           );
-        } else {
-          for (const row of whitelistMintRows || []) {
-            try {
-              const text = buildMessage({
-                name: row.name,
-                date: row.mint_date,
-                daysLeft: daysBefore,
-                network: row.type,
-                value: row.mint_price,
-              });
-              const { ok, body } = await sendTelegram(
-                TELEGRAM_BOT_TOKEN,
-                chatId,
-                text,
-              );
-              if (ok) {
-                messagesSent++;
-              } else {
-                errors.push(
-                  `telegram sendMessage failed for whitelist(mint) ${row.id}: ${body}`,
-                );
-              }
-            } catch (e) {
+        }
+
+        type WhitelistNotice = {
+          row: Record<string, unknown>;
+          kind: 'application' | 'mint';
+        };
+        const noticesById = new Map<string, WhitelistNotice>();
+        for (const row of whitelistApply.data || []) {
+          if (row && row.id) {
+            noticesById.set(String(row.id), { row, kind: 'application' });
+          }
+        }
+        for (const row of whitelistMint.data || []) {
+          if (!row || !row.id) continue;
+          const key = String(row.id);
+          // Only add the mint notice if the row didn't already match on
+          // application_deadline (dedup rule: prefer application).
+          if (!noticesById.has(key)) {
+            noticesById.set(key, { row, kind: 'mint' });
+          }
+        }
+
+        for (const notice of noticesById.values()) {
+          const { row, kind } = notice;
+          try {
+            const text = buildMessage({
+              name: row.name,
+              date:
+                kind === 'application'
+                  ? row.application_deadline
+                  : row.mint_date,
+              daysLeft: daysBefore,
+              network: row.type,
+              value: row.mint_price,
+            });
+            const { ok, body } = await sendTelegram(
+              TELEGRAM_BOT_TOKEN,
+              chatId,
+              text,
+            );
+            if (ok) {
+              messagesSent++;
+            } else {
               errors.push(
-                `whitelist ${row.id} mint notification threw: ${(e as Error).message}`,
+                `telegram sendMessage failed for whitelist(${kind}) ${row.id}: ${body}`,
               );
             }
+          } catch (e) {
+            errors.push(
+              `whitelist ${row.id} ${kind} notification threw: ${(e as Error).message}`,
+            );
           }
         }
       } catch (e) {

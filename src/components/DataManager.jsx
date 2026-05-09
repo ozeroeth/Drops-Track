@@ -380,7 +380,7 @@ export default function DataManager({
       <ConfirmDialog
         open={pendingReset}
         title="Clear all data?"
-        body="This will wipe all of your airdrops, whitelists, and wallets in Supabase and reseed the sample data. Other users are unaffected."
+        body="This will wipe all of your airdrops, whitelists, and wallets in Supabase and reseed the sample data. Your Telegram notification settings are preserved. Other users are unaffected."
         confirmLabel="Clear and reseed"
         onConfirm={performReset}
         onCancel={() => setPendingReset(false)}

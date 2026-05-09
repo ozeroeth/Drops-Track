@@ -16,9 +16,22 @@ import {
 //
 // Errors are swallowed and logged to console.error: a broken seed must not
 // block login or force-reseed from the Data tab.
+//
+// Atomicity: seedInitialDataIfEmpty writes user_settings ONLY after all
+// three collection inserts succeed. If any insert throws, the caller sees
+// the error, user_settings stays missing, and on the next login we retry
+// the seed from scratch (preceded by best-effort cleanup of any partial
+// rows we wrote). The fallback branch that stamps user_settings when data
+// is already present (a pre-Supabase migration case) is gated on ALL three
+// tables being non-empty, so a partial-seed user is never mis-identified
+// as "already onboarded".
 
 function arraysEmpty(...counts) {
   return counts.every((n) => n === 0);
+}
+
+function arraysFull(...counts) {
+  return counts.every((n) => n > 0);
 }
 
 async function fetchCount(table, userId) {
@@ -96,6 +109,16 @@ async function deleteAllUserRows(userId) {
   }
 }
 
+// Best-effort cleanup of rows written during a failed seed attempt. Called
+// from the catch block so the next login can retry from a clean slate.
+async function cleanupPartialSeed(userId) {
+  try {
+    await deleteAllUserRows(userId);
+  } catch (err) {
+    console.error('[seeding] cleanupPartialSeed failed:', err);
+  }
+}
+
 export async function seedInitialDataIfEmpty(userId) {
   if (!userId) return false;
   try {
@@ -113,20 +136,36 @@ export async function seedInitialDataIfEmpty(userId) {
       fetchCount('wallets', userId),
     ]);
 
-    if (!arraysEmpty(airdropCount, whitelistCount, walletCount)) {
-      // Data exists but no settings row yet - stamp the onboarded flag and
-      // leave the existing data alone.
+    // Only treat "data without settings" as an already-onboarded user when
+    // ALL three collections are populated. If only some of them are, the
+    // most likely cause is a partial-seed failure on a previous login; we
+    // leave user_settings unset so the user isn't permanently locked into
+    // that inconsistent state and the next login can retry.
+    if (arraysFull(airdropCount, whitelistCount, walletCount)) {
       await upsertUserSettings(userId);
       return false;
+    }
+
+    if (!arraysEmpty(airdropCount, whitelistCount, walletCount)) {
+      // Partial seed from a prior run. Wipe it and retry cleanly.
+      console.warn(
+        '[seeding] detected partial seed state; wiping and retrying',
+      );
+      await cleanupPartialSeed(userId);
     }
 
     const walletIdMap = await insertWalletsAndBuildMap(userId);
     await insertAirdrops(userId, walletIdMap);
     await insertWhitelists(userId, walletIdMap);
+    // user_settings is written LAST so it acts as the commit marker: if
+    // anything above threw, this row is never created and the next login
+    // retries the whole seed.
     await upsertUserSettings(userId);
     return true;
   } catch (err) {
     console.error('[seeding] seedInitialDataIfEmpty failed:', err);
+    // Roll back any partial writes so the next login starts clean.
+    await cleanupPartialSeed(userId);
     return false;
   }
 }
@@ -138,7 +177,12 @@ export async function forceSeedSampleData(userId) {
     const walletIdMap = await insertWalletsAndBuildMap(userId);
     await insertAirdrops(userId, walletIdMap);
     await insertWhitelists(userId, walletIdMap);
-    await upsertUserSettings(userId);
+    // Intentionally do NOT touch user_settings here: this path is invoked
+    // from the Data tab's "Clear all data" button, and the confirm dialog
+    // only mentions airdrops/whitelists/wallets. Wiping telegram_chat_id
+    // or notify_enabled would silently reset Telegram config the user had
+    // already configured. The initial-seed path above handles creating
+    // the settings row for first-time users.
     return true;
   } catch (err) {
     console.error('[seeding] forceSeedSampleData failed:', err);

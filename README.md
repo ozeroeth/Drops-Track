@@ -106,6 +106,10 @@ In the Supabase Dashboard, open **Database > Cron Jobs** and create a new job th
 
 That runs at 09:00 UTC daily. Date comparisons inside the function happen in UTC, so users in non-UTC timezones may see a +/- 1 day shift relative to their local calendar.
 
+**JWT verification is disabled** on `check-deadlines` via `supabase/config.toml`, because the scheduler calls it with no user session. If you do not deploy via the CLI and instead paste the function source into the dashboard, be sure to toggle **Verify JWT** to **off** for that function in the dashboard UI, or Supabase Cron Jobs will hit it with no Authorization header and get 401s every day silently. `send-test-notification` stays JWT-verified: it runs under the caller's session and uses that identity to look up the caller's chat id.
+
+`check-deadlines` notifies on any airdrop whose deadline is exactly N days out with status `Active` or `Pending`. `Claimed` and `Missed` airdrops are skipped. For whitelists, it notifies on `application_deadline` (status `Applied`) and `mint_date` (status `Applied` or `Whitelisted`); if both dates fall on the same target day, the row receives a single message (the application-deadline one is preferred).
+
 ### 8. Telegram bot setup
 
 1. Open Telegram and message **@BotFather**. Send `/newbot`, pick a name and a `@username`, and note the HTTP API token BotFather hands back. That token is the `TELEGRAM_BOT_TOKEN` you stored in step 6.
@@ -118,7 +122,7 @@ That runs at 09:00 UTC daily. Date comparisons inside the function happen in UTC
 
 - **Login button does nothing.** Check that `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are set in `.env`, and that you restarted the dev server after editing `.env`. Vite only reads env files at startup.
 - **OAuth redirect 404 / `redirect_uri_mismatch`.** The **Authorized redirect URI** in the Google Cloud Console must match the callback URL shown by Supabase exactly, character for character, including the trailing path.
-- **No Telegram messages after the cron fires.** Confirm `TELEGRAM_BOT_TOKEN` is set (`supabase secrets list`), the cron job is enabled in Supabase Dashboard > Database > Cron Jobs, and the user actually has `notify_enabled = true` and a non-null `telegram_chat_id` in `user_settings`. Check the function logs under **Edge Functions > check-deadlines > Logs** for per-row errors.
+- **No Telegram messages after the cron fires.** Confirm `TELEGRAM_BOT_TOKEN` is set (`supabase secrets list`), the cron job is enabled in Supabase Dashboard > Database > Cron Jobs, and the user actually has `notify_enabled = true` and a non-null `telegram_chat_id` in `user_settings`. Check the function logs under **Edge Functions > check-deadlines > Logs** for per-row errors. If the logs show 401s from the cron, the `verify_jwt = false` setting in `supabase/config.toml` was not applied; toggle **Verify JWT** to **off** for `check-deadlines` in the dashboard.
 - **`Send test notification` returns `No Telegram chat ID configured`.** The user has not yet saved a chat id. Enter one in the Settings page and click **Save** first, then retry the test.
 
 ## Local Development

@@ -9,28 +9,35 @@ import { supabase } from '../lib/supabase.js';
 // unchanged. Under the hood setRows diffs old vs new by `id` and translates
 // the difference into Supabase insert/update/delete calls.
 //
-// Diff rules:
-//   - id in next but not in prev  -> insert (objToRow strips non-UUID ids so
-//                                    Postgres assigns a fresh UUID)
-//   - id in prev but not in next  -> delete (by the prev id)
-//   - id in both, JSON differs    -> update
+// Write serialization
+// -------------------
+// All setRows invocations are funnelled through a per-hook promise queue
+// (writeQueueRef). A new setRows call chains onto the tail of the queue and
+// does not start until the previous mutation has fully resolved. This
+// serializes writes in call order and closes the lost-update race where a
+// mutation fired during an in-flight write could race with it.
 //
-// State is updated optimistically before the network calls fire. After all
-// writes resolve we trigger a refresh() so the local rows pick up any
-// server-assigned UUIDs for newly inserted records (inserts made locally
-// with a client-generated non-UUID id like `id-<ts>-<rand>` will be
-// replaced by their real UUID equivalents on refresh).
+// Temp-id reconciliation
+// ----------------------
+// Rows added with a client-generated non-UUID id land in the DB via
+// `.insert(...).select()`. The returned server rows carry the authoritative
+// UUID, which we record in tempIdMapRef as `tempId -> realId`. We
+// intentionally do NOT swap the id in local React state: doing so would
+// break code paths that captured the tempId in a click handler closure
+// (e.g. "toggle a task on the row I just added"). Instead, we translate
+// tempId -> realId on outgoing UPDATE and DELETE queries, so those writes
+// hit the correct server row while local state keeps working with the
+// original tempId. The tempId is naturally replaced on the next refresh().
+//
+// Fetch generation
+// ----------------
+// Each refresh() increments fetchGenRef; when a fetch resolves we only
+// apply it if its captured gen still matches. This prevents a slow initial
+// fetch (fired right after login) from overwriting post-seed state
+// produced by a later fetch.
 //
 // Signature:
 //   useSupabaseCollection(table, { rowToObj, objToRow, userId, enabled })
-//
-// Arguments:
-//   table      - table name (e.g. 'airdrops').
-//   rowToObj   - (row) => uiObject
-//   objToRow   - (obj, userId) => dbRow  (strips non-UUID ids, adds user_id)
-//   userId     - the auth.uid() of the current user; null/undefined disables
-//                mutations and leaves rows = [].
-//   enabled    - boolean; when false the hook is a no-op (rows=[], loading=false).
 
 function indexById(list) {
   const map = new Map();
@@ -90,18 +97,36 @@ export default function useSupabaseCollection(
   const tableRef = useRef(table);
   tableRef.current = table;
 
+  // Per-hook write queue. Every setRows invocation .then()s onto this chain
+  // so writes serialize in call order. Errors are caught inside the chained
+  // job so a single failure doesn't permanently break the queue.
+  const writeQueueRef = useRef(Promise.resolve());
+
+  // Temp client id -> real server UUID, populated when an insert completes.
+  // Update/delete queries consult this map so they target the correct row
+  // even when local state still carries the temp id.
+  const tempIdMapRef = useRef(new Map());
+
+  // Monotonic fetch generation. refresh() captures the current gen; when the
+  // fetch resolves we only apply the result if our gen is still the latest.
+  const fetchGenRef = useRef(0);
+
   const refresh = useCallback(async () => {
     if (!enabled || !userId) {
       setRowsState([]);
       setLoading(false);
       return [];
     }
+    const gen = ++fetchGenRef.current;
     setLoading(true);
     setError(null);
     const { data, error: fetchError } = await supabase
       .from(table)
       .select('*')
       .order('created_at', { ascending: true });
+    // If another refresh started while we were awaiting, this response is
+    // stale: drop it on the floor.
+    if (gen !== fetchGenRef.current) return [];
     if (fetchError) {
       setError(fetchError);
       setLoading(false);
@@ -110,8 +135,13 @@ export default function useSupabaseCollection(
     const mapped = Array.isArray(data)
       ? data.map((r) => rowToObjRef.current(r)).filter(Boolean)
       : [];
+    rowsRef.current = mapped;
     setRowsState(mapped);
     setLoading(false);
+    // A refresh brings local state back to server shape (real UUIDs); any
+    // tempId -> realId mappings are now represented directly in state, so
+    // the map can be cleared.
+    tempIdMapRef.current.clear();
     return mapped;
   }, [table, userId, enabled]);
 
@@ -129,84 +159,104 @@ export default function useSupabaseCollection(
 
   const setRows = useCallback(
     (updater) => {
-      const prev = rowsRef.current;
-      const next =
-        typeof updater === 'function' ? updater(prev) : updater;
-      const safeNext = Array.isArray(next) ? next : [];
+      // Enqueue this mutation behind any in-flight ones. The queue is a
+      // promise chain; we attach the new job with .then so it waits for
+      // the previous job's resolution, and the job's own errors are caught
+      // at the end so subsequent calls continue to run.
+      const job = writeQueueRef.current.then(async () => {
+        const prev = rowsRef.current;
+        const nextRaw = typeof updater === 'function' ? updater(prev) : updater;
+        const safeNext = Array.isArray(nextRaw) ? nextRaw : [];
 
-      // Optimistic local update first so the UI responds immediately.
-      rowsRef.current = safeNext;
-      setRowsState(safeNext);
+        // Invalidate any in-flight fetch so its stale response can't
+        // overwrite the optimistic local state we're about to set. A fetch
+        // that landed before this write began shouldn't clobber our new
+        // rows with its pre-write snapshot.
+        fetchGenRef.current++;
 
-      const uid = userIdRef.current;
-      if (!uid) return;
+        // Optimistic local update first so the UI responds immediately.
+        rowsRef.current = safeNext;
+        setRowsState(safeNext);
 
-      const { inserts, updates, deletes } = diffById(prev, safeNext);
-      if (!inserts.length && !updates.length && !deletes.length) return;
+        const uid = userIdRef.current;
+        if (!uid) return;
 
-      const tbl = tableRef.current;
-      const toRow = objToRowRef.current;
+        const { inserts, updates, deletes } = diffById(prev, safeNext);
+        if (!inserts.length && !updates.length && !deletes.length) return;
 
-      const ops = [];
-      if (inserts.length) {
-        const payload = inserts
-          .map((obj) => toRow(obj, uid))
-          .filter(Boolean);
-        if (payload.length) {
-          ops.push(
-            supabase
+        const tbl = tableRef.current;
+        const toRow = objToRowRef.current;
+
+        // ---- INSERTS ----
+        // .insert().select() returns the server rows (with real UUIDs) in
+        // the same order as the payload. Capture the mapping from temp
+        // client id to real server UUID so later updates/deletes targeting
+        // the temp id hit the correct row on the server.
+        if (inserts.length) {
+          const tempIds = [];
+          const payload = [];
+          for (const obj of inserts) {
+            const row = toRow(obj, uid);
+            if (!row) continue;
+            tempIds.push(obj.id);
+            payload.push(row);
+          }
+          if (payload.length) {
+            const { data, error: insertErr } = await supabase
               .from(tbl)
               .insert(payload)
-              .then((res) => {
-                if (res.error) throw res.error;
-                return res;
-              }),
-          );
+              .select();
+            if (insertErr) throw insertErr;
+            if (Array.isArray(data)) {
+              for (let i = 0; i < data.length && i < tempIds.length; i++) {
+                const serverRow = data[i];
+                if (!serverRow || !serverRow.id) continue;
+                const tempId = tempIds[i];
+                if (tempId && tempId !== serverRow.id) {
+                  tempIdMapRef.current.set(tempId, serverRow.id);
+                }
+              }
+            }
+          }
         }
-      }
-      for (const { id, obj } of updates) {
-        const row = toRow(obj, uid);
-        if (!row) continue;
-        // Don't try to overwrite the id on update.
-        delete row.id;
-        ops.push(
-          supabase
+
+        // ---- UPDATES ----
+        for (const { id, obj } of updates) {
+          const realId = tempIdMapRef.current.get(id) || id;
+          const row = toRow(obj, uid);
+          if (!row) continue;
+          // Don't try to overwrite the id on update.
+          delete row.id;
+          const { error: updateErr } = await supabase
             .from(tbl)
             .update(row)
-            .eq('id', id)
-            .then((res) => {
-              if (res.error) throw res.error;
-              return res;
-            }),
-        );
-      }
-      if (deletes.length) {
-        ops.push(
-          supabase
+            .eq('id', realId);
+          if (updateErr) throw updateErr;
+        }
+
+        // ---- DELETES ----
+        if (deletes.length) {
+          const realDeletes = deletes.map(
+            (id) => tempIdMapRef.current.get(id) || id,
+          );
+          const { error: deleteErr } = await supabase
             .from(tbl)
             .delete()
-            .in('id', deletes)
-            .then((res) => {
-              if (res.error) throw res.error;
-              return res;
-            }),
-        );
-      }
+            .in('id', realDeletes);
+          if (deleteErr) throw deleteErr;
+          // Drop any reconciled temp-id mappings that no longer correspond
+          // to a live row, so the map doesn't grow unbounded.
+          for (const id of deletes) tempIdMapRef.current.delete(id);
+        }
+      });
 
-      Promise.all(ops)
-        .then(() => {
-          // If any inserts happened, the DB assigned new UUIDs that aren't
-          // in our optimistic local state; refresh to pick them up.
-          if (inserts.length) {
-            refresh().catch((err) => setError(err));
-          }
-        })
-        .catch((err) => {
-          setError(err);
-          // Best-effort reconciliation: pull the authoritative server state
-          // back into local so the UI doesn't stay wedged on a failed write.
-          refresh().catch(() => {});
-        });
+      // Catch the job's errors at the tail so the chain keeps flowing, but
+      // preserve them on `error` state and best-effort-reconcile with the
+      // server.
+      writeQueueRef.current = job.catch((err) => {
+        setError(err);
+        refresh().catch(() => {});
+      });
     },
     [refresh],
   );
