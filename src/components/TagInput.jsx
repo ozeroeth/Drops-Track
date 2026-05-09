@@ -62,14 +62,20 @@ export default function TagInput({
           {tags.map((tag, i) => (
             <span
               key={`${tag}-${i}`}
-              className="inline-flex items-center gap-1 rounded-full border border-accent-500/30 bg-accent-500/10 px-2 py-0.5 text-xs text-accent-200"
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+              style={{
+                backgroundColor: 'rgba(247,147,26,0.1)',
+                border: '1px solid rgba(247,147,26,0.2)',
+                color: '#F7931A',
+              }}
             >
               <span>{tag}</span>
               <button
                 type="button"
                 onClick={() => removeAt(i)}
                 aria-label={`Remove ${tag}`}
-                className="rounded-full px-1 text-accent-200/80 hover:bg-accent-500/20 hover:text-accent-100 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+                className="rounded-full px-1 transition-colors hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                style={{ color: '#F7931A' }}
               >
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -88,7 +94,11 @@ export default function TagInput({
         }}
         placeholder="Add a tag and press Enter"
         maxLength={MAX_TAG_LENGTH}
-        className="w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+        className="w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40"
+        style={{
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }}
       />
       {availableSuggestions.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
@@ -97,7 +107,8 @@ export default function TagInput({
               key={s}
               type="button"
               onClick={() => commit(s)}
-              className="inline-flex items-center rounded-full border border-surface2 bg-surface2 px-2 py-0.5 text-xs text-slate-300 hover:border-accent-500/40 hover:bg-accent-500/10 hover:text-accent-200 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="inline-flex items-center rounded-full border border-surfaceBorder px-2 py-0.5 text-xs text-textSecondary transition-colors hover:border-primary/40 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+              style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
             >
               + {s}
             </button>

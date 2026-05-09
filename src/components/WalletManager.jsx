@@ -29,13 +29,20 @@ function WalletCard({ wallet, airdropCount, whitelistCount, onEdit, onDelete }) 
   }
 
   return (
-    <article className="flex flex-col gap-3 rounded-lg border border-surface2 bg-surface p-4">
+    <article
+      className="flex flex-col gap-3 overflow-hidden rounded-2xl p-5 transition-all duration-200"
+      style={{
+        background: 'rgba(13,17,23,0.85)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold text-slate-50">
+          <h3 className="truncate text-base font-semibold text-white">
             {wallet.label}
           </h3>
-          <span className="mt-1 inline-flex items-center rounded-md border border-surface2 bg-surface2 px-2 py-0.5 text-xs text-slate-300">
+          <span className="mt-1 inline-flex items-center rounded-full border border-surfaceBorder px-2 py-0.5 text-xs text-textSecondary">
             {wallet.chainType}
           </span>
         </div>
@@ -43,14 +50,14 @@ function WalletCard({ wallet, airdropCount, whitelistCount, onEdit, onDelete }) 
           <button
             type="button"
             onClick={() => onEdit(wallet)}
-            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-lg border border-surfaceBorder px-2.5 py-1 text-xs text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             Edit
           </button>
           <button
             type="button"
             onClick={() => onDelete(wallet)}
-            className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400/60"
+            className="rounded-lg border border-danger/30 px-2.5 py-1 text-xs text-danger transition-colors hover:bg-danger/10 focus:outline-none focus:ring-2 focus:ring-danger/40"
           >
             Delete
           </button>
@@ -58,10 +65,10 @@ function WalletCard({ wallet, airdropCount, whitelistCount, onEdit, onDelete }) 
       </header>
 
       <div className="text-xs">
-        <div className="uppercase tracking-wide text-slate-500">Address</div>
+        <div className="uppercase tracking-wide text-textSecondary">Address</div>
         <div className="mt-1 flex items-center gap-2">
           <span
-            className="truncate font-mono text-slate-200"
+            className="truncate font-mono text-white/80"
             title={wallet.address}
           >
             {truncateAddress(wallet.address)}
@@ -69,19 +76,19 @@ function WalletCard({ wallet, airdropCount, whitelistCount, onEdit, onDelete }) 
           <button
             type="button"
             onClick={handleCopy}
-            className="rounded-md border border-surface2 bg-surface2 px-2 py-0.5 text-[11px] text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-lg border border-surfaceBorder px-2 py-0.5 text-[11px] text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 text-xs text-slate-400">
+      <div className="flex items-center gap-4 text-xs text-textSecondary">
         <span>
-          <span className="font-semibold text-slate-200">{airdropCount}</span> airdrops
+          <span className="font-semibold text-white">{airdropCount}</span> airdrops
         </span>
         <span>
-          <span className="font-semibold text-slate-200">{whitelistCount}</span> whitelists
+          <span className="font-semibold text-white">{whitelistCount}</span> whitelists
         </span>
       </div>
     </article>
@@ -135,11 +142,14 @@ export default function WalletManager({ wallets, setWallets, airdrops, whitelist
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-200">Wallets</h2>
+        <h2 className="text-sm font-semibold text-white">Wallets</h2>
         <button
           type="button"
           onClick={() => setEditing('new')}
-          className="rounded-md border border-accent-500/40 bg-accent-500 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-primary/20"
+          style={{
+            background: 'linear-gradient(135deg, #F7931A, #E8820A)',
+          }}
         >
           + Add Wallet
         </button>

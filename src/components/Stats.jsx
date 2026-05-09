@@ -3,25 +3,18 @@ import EmptyState from './EmptyState.jsx';
 import { AIRDROP_STATUSES, WHITELIST_STATUSES } from '../constants/index.js';
 import { resolveNetworkLabel } from '../utils/networks.js';
 
-// Tailwind color mapping aligned with StatusBadge.jsx:
-//   Active/Whitelisted/Minted -> emerald
-//   Pending/Applied           -> yellow
-//   Missed/Not Selected       -> red
-//   Claimed                   -> blue
-// We duplicate a small map here rather than altering StatusBadge so the
-// badge component stays a pure visual primitive.
 const STATUS_BAR_COLORS = {
-  Active: 'bg-emerald-500',
-  Whitelisted: 'bg-emerald-500',
-  Minted: 'bg-emerald-500',
-  Pending: 'bg-yellow-500',
-  Applied: 'bg-yellow-500',
-  Missed: 'bg-red-500',
-  'Not Selected': 'bg-red-500',
-  Claimed: 'bg-blue-500',
+  Active: '#00C896',
+  Whitelisted: '#00C896',
+  Minted: '#00C896',
+  Pending: '#FFB800',
+  Applied: '#FFB800',
+  Missed: '#FF4757',
+  'Not Selected': '#FF4757',
+  Claimed: '#00D1FF',
 };
 
-const FALLBACK_BAR_COLOR = 'bg-slate-500';
+const FALLBACK_BAR_COLOR = '#8892A4';
 
 const MONTH_SHORT = [
   'Jan',
@@ -61,10 +54,17 @@ function monthKey(year, monthIndex) {
 
 function SummaryTile({ title, value, hint }) {
   return (
-    <div className="rounded-lg border border-surface2 bg-surface p-4">
-      <p className="text-xs uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-50">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-slate-500">{hint}</p> : null}
+    <div
+      className="rounded-2xl p-5"
+      style={{
+        background: 'rgba(13,17,23,0.85)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+      <p className="text-xs uppercase tracking-wide text-textSecondary">{title}</p>
+      <p className="mt-1 font-heading text-3xl font-bold text-white">{value}</p>
+      {hint ? <p className="mt-1 text-xs text-textSecondary">{hint}</p> : null}
     </div>
   );
 }
@@ -76,16 +76,17 @@ function StatusRow({ status, count, total }) {
   return (
     <li className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-medium text-slate-200">{status}</span>
-        <span className="text-slate-400">
-          <span className="text-slate-200">{count}</span>
-          <span className="mx-1 text-slate-500">/</span>
+        <span className="font-medium text-white">{status}</span>
+        <span className="text-textSecondary">
+          <span className="text-white">{count}</span>
+          <span className="mx-1 text-textSecondary">/</span>
           <span>{total}</span>
-          <span className="ml-2 text-slate-500">{pctLabel}</span>
+          <span className="ml-2 text-textSecondary">{pctLabel}</span>
         </span>
       </div>
       <div
-        className="h-2 w-full overflow-hidden rounded-full bg-surface2"
+        className="h-2 w-full overflow-hidden rounded-full"
+        style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
@@ -93,8 +94,8 @@ function StatusRow({ status, count, total }) {
         aria-label={`${status} share`}
       >
         <div
-          className={'h-full rounded-full ' + barColor}
-          style={{ width: `${pct}%` }}
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${pct}%`, backgroundColor: barColor }}
         />
       </div>
     </li>
@@ -266,11 +267,17 @@ export default function Stats({ airdrops, whitelists, wallets }) {
     ? `${mostUsedWallet.count} entr${mostUsedWallet.count === 1 ? 'y' : 'ies'} across airdrops and whitelists`
     : 'No wallet usage recorded yet';
 
+  const glassSection = {
+    background: 'rgba(13,17,23,0.85)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    backdropFilter: 'blur(12px)',
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-100">Stats</h2>
-        <p className="text-xs text-slate-400">
+        <h2 className="text-lg font-semibold text-white">Stats</h2>
+        <p className="text-xs text-textSecondary">
           Read-only analytics across your tracked airdrops and whitelists.
         </p>
       </div>
@@ -303,33 +310,33 @@ export default function Stats({ airdrops, whitelists, wallets }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
-          <h3 className="text-sm font-semibold text-slate-100">
+        <section className="rounded-2xl p-5" style={glassSection}>
+          <h3 className="text-sm font-semibold text-white">
             Best performing network
           </h3>
-          <p className="mt-2 text-2xl font-semibold text-slate-50">
+          <p className="mt-2 font-heading text-3xl font-bold text-white">
             {bestNetworkLabel}
           </p>
-          <p className="mt-1 text-xs text-slate-500">{bestNetworkHint}</p>
+          <p className="mt-1 text-xs text-textSecondary">{bestNetworkHint}</p>
         </section>
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
-          <h3 className="text-sm font-semibold text-slate-100">
+        <section className="rounded-2xl p-5" style={glassSection}>
+          <h3 className="text-sm font-semibold text-white">
             Most used wallet
           </h3>
-          <p className="mt-2 truncate text-2xl font-semibold text-slate-50">
+          <p className="mt-2 truncate font-heading text-3xl font-bold text-white">
             {mostUsedWalletLabel}
           </p>
-          <p className="mt-1 text-xs text-slate-500">{mostUsedWalletHint}</p>
+          <p className="mt-1 text-xs text-textSecondary">{mostUsedWalletHint}</p>
         </section>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
+        <section className="rounded-2xl p-5" style={glassSection}>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-100">
+            <h3 className="text-sm font-semibold text-white">
               Airdrops by status
             </h3>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-textSecondary">
               {safeAirdrops.length} total
             </span>
           </div>
@@ -352,12 +359,12 @@ export default function Stats({ airdrops, whitelists, wallets }) {
           )}
         </section>
 
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
+        <section className="rounded-2xl p-5" style={glassSection}>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-100">
+            <h3 className="text-sm font-semibold text-white">
               Whitelists by status
             </h3>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-textSecondary">
               {safeWhitelists.length} total
             </span>
           </div>
@@ -381,12 +388,12 @@ export default function Stats({ airdrops, whitelists, wallets }) {
         </section>
       </div>
 
-      <section className="rounded-lg border border-surface2 bg-surface p-4">
+      <section className="rounded-2xl p-5" style={glassSection}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-100">
+          <h3 className="text-sm font-semibold text-white">
             Monthly activity
           </h3>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-textSecondary">
             Entries added per month, last 12 months
           </span>
         </div>
@@ -409,10 +416,13 @@ export default function Stats({ airdrops, whitelists, wallets }) {
                     className="flex h-full flex-1 items-end"
                     title={`${b.label} ${b.year}: ${b.count} entr${b.count === 1 ? 'y' : 'ies'}`}
                   >
-                    <div className="flex h-full w-full flex-col justify-end rounded-sm bg-surface2/60">
+                    <div
+                      className="flex h-full w-full flex-col justify-end rounded-sm"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+                    >
                       <div
-                        className="w-full rounded-sm bg-accent-400"
-                        style={{ height: `${pct}%` }}
+                        className="w-full rounded-sm"
+                        style={{ height: `${pct}%`, backgroundColor: '#F7931A' }}
                         aria-hidden="true"
                       />
                     </div>
@@ -428,7 +438,7 @@ export default function Stats({ airdrops, whitelists, wallets }) {
                 return (
                   <div
                     key={b.key + '-label'}
-                    className="flex-1 text-center text-[10px] uppercase tracking-wide text-slate-500"
+                    className="flex-1 text-center text-[10px] uppercase tracking-wide text-textSecondary"
                   >
                     {label}
                   </div>

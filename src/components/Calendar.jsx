@@ -46,7 +46,6 @@ function parseIsoDay(iso) {
   }
   const normalized = new Date(y, m - 1, d);
   if (Number.isNaN(normalized.getTime())) return null;
-  // Normalize to local Y-M-D at midnight so we can bucket by day.
   return { iso: toDayIso(normalized), date: normalized };
 }
 
@@ -66,13 +65,12 @@ function urgencyFor(iso) {
   return 'future';
 }
 
-// Priority: past (red) > soon (orange) > future (green) > unknown (slate).
 const URGENCY_RANK = { past: 0, soon: 1, future: 2, unknown: 3 };
 const URGENCY_DOT_CLASS = {
-  past: 'bg-red-500',
-  soon: 'bg-orange-500',
-  future: 'bg-emerald-500',
-  unknown: 'bg-slate-500',
+  past: 'bg-danger',
+  soon: 'bg-warning',
+  future: 'bg-success',
+  unknown: 'bg-textSecondary',
 };
 
 function mostUrgent(events) {
@@ -143,7 +141,7 @@ function KindLabel({ kind }) {
   if (kind === 'whitelist-apply') text = 'Whitelist apply';
   else if (kind === 'whitelist-mint') text = 'Whitelist mint';
   return (
-    <span className="inline-flex items-center rounded-full border border-surface2 bg-surface2/60 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-slate-300">
+    <span className="inline-flex items-center rounded-full border border-surfaceBorder px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-textSecondary">
       {text}
     </span>
   );
@@ -166,7 +164,7 @@ export default function Calendar({ airdrops, whitelists }) {
 
   const grid = useMemo(() => {
     const firstOfMonth = startOfMonth(currentMonth);
-    const weekday = firstOfMonth.getDay(); // 0 (Sun) .. 6 (Sat)
+    const weekday = firstOfMonth.getDay();
     const start = new Date(
       firstOfMonth.getFullYear(),
       firstOfMonth.getMonth(),
@@ -211,18 +209,24 @@ export default function Calendar({ airdrops, whitelists }) {
   };
 
   const navButtonClass =
-    'inline-flex items-center justify-center rounded-md border border-surface2 bg-surface2/60 px-2 py-1 text-sm text-slate-200 transition-colors hover:border-accent-500/60 hover:text-slate-50 focus:outline-none focus:ring-2 focus:ring-accent-500/40';
+    'inline-flex items-center justify-center rounded-lg border border-surfaceBorder px-2.5 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40';
+
+  const glassStyle = {
+    background: 'rgba(13,17,23,0.85)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    backdropFilter: 'blur(12px)',
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-100">Calendar</h2>
-        <p className="text-xs text-slate-400">
+        <h2 className="text-lg font-semibold text-white">Calendar</h2>
+        <p className="text-xs text-textSecondary">
           Airdrop deadlines and whitelist apply/mint dates laid out by day.
         </p>
       </div>
 
-      <section className="rounded-lg border border-surface2 bg-surface p-4">
+      <section className="rounded-2xl p-5" style={glassStyle}>
         <div className="mb-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <button
@@ -242,7 +246,7 @@ export default function Calendar({ airdrops, whitelists }) {
               &rarr;
             </button>
           </div>
-          <h3 className="text-sm font-semibold text-slate-100 sm:text-base">
+          <h3 className="text-sm font-semibold text-white sm:text-base">
             {monthTitle}
           </h3>
           <button
@@ -255,7 +259,7 @@ export default function Calendar({ airdrops, whitelists }) {
           </button>
         </div>
 
-        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-wide text-slate-500">
+        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-wide text-textSecondary">
           {WEEKDAYS.map((d) => (
             <div key={d} className="py-1">
               {d}
@@ -273,20 +277,20 @@ export default function Calendar({ airdrops, whitelists }) {
               : 'bg-transparent';
 
             const base =
-              'flex h-16 flex-col justify-between rounded-md border px-1.5 py-1 text-left text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500/40 sm:h-20';
+              'flex h-16 flex-col justify-between rounded-lg border px-1.5 py-1 text-left text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 sm:h-20';
             let stateClasses;
             if (cell.isToday) {
               stateClasses =
-                'border-accent-500/70 bg-surface2/70 text-slate-100 ring-1 ring-accent-500/40';
+                'border-primary bg-surface text-white ring-1 ring-primary/40';
             } else if (isSelected) {
               stateClasses =
-                'border-accent-500/60 bg-surface2/60 text-slate-100';
+                'border-primary/60 bg-surfaceBorder text-white';
             } else if (cell.inMonth) {
               stateClasses =
-                'border-surface2 bg-surface/70 text-slate-200 hover:border-accent-500/40 hover:bg-surface2/60';
+                'border-surfaceBorder bg-surface text-white/80 hover:border-primary/40 hover:bg-surfaceBorder';
             } else {
               stateClasses =
-                'border-surface2/60 bg-surface/40 text-slate-500 hover:border-accent-500/30 hover:text-slate-300';
+                'border-surfaceBorder/60 bg-bg text-textSecondary hover:border-primary/30 hover:text-white/70';
             }
 
             return (
@@ -316,7 +320,7 @@ export default function Calendar({ airdrops, whitelists }) {
                         aria-hidden="true"
                       />
                       {cell.events.length > 1 ? (
-                        <span className="rounded-full border border-surface2 bg-surface2/80 px-1 text-[9px] font-semibold text-slate-200">
+                        <span className="rounded-full border border-surfaceBorder px-1 text-[9px] font-semibold text-white/80">
                           {cell.events.length}
                         </span>
                       ) : null}
@@ -330,28 +334,28 @@ export default function Calendar({ airdrops, whitelists }) {
           })}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-wide text-slate-500">
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-wide text-textSecondary">
           <span className="inline-flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
+            <span className="inline-block h-2 w-2 rounded-full bg-danger" />
             Past
           </span>
           <span className="inline-flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-orange-500" />
+            <span className="inline-block h-2 w-2 rounded-full bg-warning" />
             Within 3 days
           </span>
           <span className="inline-flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="inline-block h-2 w-2 rounded-full bg-success" />
             Upcoming
           </span>
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface2 bg-surface p-4">
+      <section className="rounded-2xl p-5" style={glassStyle}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-100">
+          <h3 className="text-sm font-semibold text-white">
             Events on {formatDate(selectedIso)}
           </h3>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-textSecondary">
             {selectedEvents.length} event
             {selectedEvents.length === 1 ? '' : 's'}
           </span>
@@ -366,13 +370,14 @@ export default function Calendar({ airdrops, whitelists }) {
             {selectedEvents.map((ev, idx) => (
               <li
                 key={`${ev.kind}-${ev.id}-${idx}`}
-                className="flex flex-col gap-2 rounded-md border border-surface2 bg-surface/60 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 rounded-xl border border-surfaceBorder px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                style={{ background: 'rgba(13,17,23,0.6)' }}
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-100">
+                  <p className="truncate text-sm font-medium text-white">
                     {ev.name}
                   </p>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-textSecondary">
                     <KindLabel kind={ev.kind} />
                     {ev.status ? <StatusBadge status={ev.status} /> : null}
                   </div>

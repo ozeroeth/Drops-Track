@@ -1,7 +1,8 @@
 import React from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
-import { isExpiringSoon, isPast, primaryWhitelistDeadline } from '../utils/date.js';
+import CardActionMenu from './CardActionMenu.jsx';
+import { isExpiringSoon, isPast, daysUntil, primaryWhitelistDeadline } from '../utils/date.js';
 
 function truncateAddress(addr) {
   if (!addr || typeof addr !== 'string') return '';
@@ -15,54 +16,56 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
     isPast(primaryIso) &&
     (whitelist.status === 'Applied' || whitelist.status === 'Whitelisted');
   const soon = isExpiringSoon(primaryIso) && !overdue;
-
-  let borderClass = 'border-surface2';
-  if (overdue) borderClass = 'border-red-500/70';
-  else if (soon) borderClass = 'border-orange-500/70';
+  const dLeft = daysUntil(primaryIso);
 
   return (
     <article
-      className={
-        'flex flex-col gap-3 rounded-lg border bg-surface p-4 ' + borderClass
-      }
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-5 transition-all duration-200"
+      style={{
+        background: 'rgba(13,17,23,0.85)',
+        border: soon
+          ? '1px solid rgba(247,147,26,0.3)'
+          : '1px solid rgba(255,255,255,0.06)',
+        borderTop: '1px solid rgba(255,255,255,0.1)',
+        backdropFilter: 'blur(12px)',
+        borderLeft: soon ? '3px solid #FF4757' : undefined,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(247,147,26,0.3)';
+        e.currentTarget.style.boxShadow = '0 0 20px rgba(247,147,26,0.08)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = soon
+          ? 'rgba(247,147,26,0.3)'
+          : 'rgba(255,255,255,0.06)';
+        e.currentTarget.style.boxShadow = 'none';
+      }}
     >
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold text-slate-50">
+          <h3 className="truncate text-base font-semibold text-white">
             {whitelist.name}
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-md border border-surface2 bg-surface2 px-2 py-0.5 text-xs text-slate-300">
+            <span
+              className="inline-flex items-center rounded-full border border-surfaceBorder px-2 py-0.5 text-xs text-textSecondary"
+            >
               {whitelist.type}
             </span>
             <StatusBadge status={whitelist.status} />
+            {soon && dLeft !== null ? (
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: 'rgba(255,71,87,0.15)', color: '#FF4757' }}>
+                {'\u{1F525}'} {dLeft}d left
+              </span>
+            ) : null}
           </div>
         </div>
-        <div className="flex flex-none gap-1">
-          <button
-            type="button"
-            onClick={() => onEdit(whitelist)}
-            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => onDuplicate && onDuplicate(whitelist)}
-            aria-label="Duplicate"
-            title="Duplicate"
-            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
-          >
-            <span aria-hidden="true" className="mr-1">&#x29C9;</span>
-            Duplicate
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(whitelist)}
-            className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400/60"
-          >
-            Delete
-          </button>
+        <div className="flex-none">
+          <CardActionMenu
+            onEdit={() => onEdit(whitelist)}
+            onDuplicate={() => onDuplicate && onDuplicate(whitelist)}
+            onDelete={() => onDelete(whitelist)}
+          />
         </div>
       </header>
 
@@ -71,7 +74,12 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
           {whitelist.tags.map((tag, i) => (
             <span
               key={`${tag}-${i}`}
-              className="inline-flex items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-2 py-0.5 text-xs text-accent-300"
+              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+              style={{
+                backgroundColor: 'rgba(247,147,26,0.1)',
+                border: '1px solid rgba(247,147,26,0.2)',
+                color: 'rgba(247,147,26,0.8)',
+              }}
             >
               {tag}
             </span>
@@ -86,23 +94,23 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
 
       <div className="grid grid-cols-2 gap-3 text-xs">
         <div>
-          <div className="uppercase tracking-wide text-slate-500">Wallet</div>
-          <div className="text-slate-300">
+          <div className="uppercase tracking-wide text-textSecondary">Wallet</div>
+          <div className="text-white/80">
             {wallet ? (
               <span>
                 {wallet.label}{' '}
-                <span className="text-slate-500" title={wallet.address}>
+                <span className="text-textSecondary" title={wallet.address}>
                   ({truncateAddress(wallet.address)})
                 </span>
               </span>
             ) : (
-              <span className="italic text-slate-500">Unassigned</span>
+              <span className="italic text-textSecondary">Unassigned</span>
             )}
           </div>
         </div>
         <div>
-          <div className="uppercase tracking-wide text-slate-500">Mint price</div>
-          <div className="text-slate-300">
+          <div className="uppercase tracking-wide text-textSecondary">Mint price</div>
+          <div className="text-white/80">
             {whitelist.mintPrice || '\u2014'}
           </div>
         </div>
@@ -110,7 +118,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
 
       {whitelist.notes ? (
         <p
-          className="text-xs text-slate-400"
+          className="text-xs text-textSecondary"
           style={{
             display: '-webkit-box',
             WebkitLineClamp: 3,
@@ -127,7 +135,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
           href={whitelist.link}
           target="_blank"
           rel="noreferrer"
-          className="text-xs font-medium text-accent-400 hover:text-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none"
         >
           Open official site
         </a>

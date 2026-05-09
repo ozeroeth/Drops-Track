@@ -227,7 +227,10 @@ export default function AirdropList({ airdrops, setAirdrops, wallets }) {
         <button
           type="button"
           onClick={() => setEditing('new')}
-          className="rounded-md border border-accent-500/40 bg-accent-500 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-primary/20"
+          style={{
+            background: 'linear-gradient(135deg, #F7931A, #E8820A)',
+          }}
         >
           + Add Airdrop
         </button>
@@ -237,24 +240,31 @@ export default function AirdropList({ airdrops, setAirdrops, wallets }) {
         <EmptyState
           title="No airdrops yet"
           hint="Click Add Airdrop to track your first opportunity."
+          emoji={'\u{1F680}'}
         />
       ) : visible.length === 0 ? (
         <EmptyState
           title="No airdrops match your filters"
           hint="Try clearing filters or adjusting your search."
+          emoji={'\u{1F50D}'}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visible.map((a) => (
-            <AirdropCard
+          {visible.map((a, index) => (
+            <div
               key={a.id}
-              airdrop={a}
-              wallet={walletById.get(a.walletId) || null}
-              onEdit={(entry) => setEditing(entry)}
-              onDelete={(entry) => setPendingDelete(entry)}
-              onDuplicate={handleDuplicate}
-              onToggleTask={handleToggleTask}
-            />
+              className="animate-card-entrance"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <AirdropCard
+                airdrop={a}
+                wallet={walletById.get(a.walletId) || null}
+                onEdit={(entry) => setEditing(entry)}
+                onDelete={(entry) => setPendingDelete(entry)}
+                onDuplicate={handleDuplicate}
+                onToggleTask={handleToggleTask}
+              />
+            </div>
           ))}
         </div>
       )}

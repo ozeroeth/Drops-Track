@@ -18,40 +18,50 @@ function formatUsd(value) {
   }
 }
 
-function SummaryCard({ title, value, hint, onClick }) {
-  const base =
-    'rounded-lg border border-surface2 bg-surface p-4 text-left transition-colors';
-  const interactive = onClick
-    ? ' hover:border-accent-500/60 hover:bg-surface2 focus:outline-none focus:ring-2 focus:ring-accent-500/40'
-    : '';
+const CARD_ACCENTS = [
+  { emoji: '\u{1FA82}', color: '#F7931A' },
+  { emoji: '\u{1F3AF}', color: '#9945FF' },
+  { emoji: '\u{1F4B0}', color: '#00D1FF' },
+  { emoji: '\u23F0', color: '#FF4757' },
+];
+
+function SummaryCard({ title, value, hint, onClick, accentIndex }) {
+  const accent = CARD_ACCENTS[accentIndex] || CARD_ACCENTS[0];
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={base + interactive}
+      className="relative rounded-2xl p-5 text-left transition-all duration-200 hover:-translate-y-0.5"
+      style={{
+        background: 'rgba(13,17,23,0.85)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(12px)',
+        borderLeft: `3px solid ${accent.color}`,
+      }}
     >
-      <p className="text-xs uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-50">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-slate-500">{hint}</p> : null}
+      <p className="text-xs uppercase tracking-wide text-textSecondary">
+        <span className="mr-1.5">{accent.emoji}</span>
+        {title}
+      </p>
+      <p className="mt-1 font-heading text-3xl font-bold text-white">{value}</p>
+      {hint ? <p className="mt-1 text-xs text-textSecondary">{hint}</p> : null}
     </Tag>
   );
 }
 
 function UpcomingItem({ title, subtitle, iso, label, highlight }) {
-  const borderClass = highlight
-    ? 'border-orange-500/60'
-    : 'border-surface2';
   return (
     <li
       className={
-        'flex items-center justify-between gap-3 rounded-md border bg-surface/60 px-3 py-2 ' +
-        borderClass
+        'flex items-center justify-between gap-3 rounded-xl border px-3 py-2 ' +
+        (highlight ? 'border-primary/40' : 'border-surfaceBorder')
       }
+      style={{ background: 'rgba(13,17,23,0.6)' }}
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-slate-100">{title}</p>
-        <div className="mt-0.5 text-xs text-slate-400">{subtitle}</div>
+        <p className="truncate text-sm font-medium text-white">{title}</p>
+        <div className="mt-0.5 text-xs text-textSecondary">{subtitle}</div>
       </div>
       <DeadlineLabel iso={iso} label={label} />
     </li>
@@ -136,35 +146,46 @@ export default function Dashboard({
           value={stats.activeAirdrops}
           hint="Click to open Airdrops tab"
           onClick={onJumpToAirdrops}
+          accentIndex={0}
         />
         <SummaryCard
           title="Whitelisted"
           value={stats.whitelisted}
           hint="Whitelisted or Minted"
           onClick={onJumpToWhitelists}
+          accentIndex={1}
         />
         <SummaryCard
           title="Estimated Total Value"
           value={formatUsd(stats.totalValue)}
           hint="Active airdrops only"
+          accentIndex={2}
         />
         <SummaryCard
           title="Deadlines This Week"
           value={stats.deadlinesThisWeek}
           hint="Airdrops + whitelists, next 7 days"
+          accentIndex={3}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
+        <section
+          className="rounded-2xl p-5"
+          style={{
+            background: 'rgba(13,17,23,0.85)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(12px)',
+          }}
+        >
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-100">
+            <h3 className="text-sm font-semibold text-white">
               Upcoming Airdrop Deadlines
             </h3>
             <button
               type="button"
               onClick={onJumpToAirdrops}
-              className="text-xs text-accent-400 hover:text-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="text-xs text-primary hover:underline focus:outline-none"
             >
               View all
             </button>
@@ -195,15 +216,22 @@ export default function Dashboard({
           )}
         </section>
 
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
+        <section
+          className="rounded-2xl p-5"
+          style={{
+            background: 'rgba(13,17,23,0.85)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(12px)',
+          }}
+        >
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-100">
+            <h3 className="text-sm font-semibold text-white">
               Upcoming Whitelist Mints
             </h3>
             <button
               type="button"
               onClick={onJumpToWhitelists}
-              className="text-xs text-accent-400 hover:text-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="text-xs text-primary hover:underline focus:outline-none"
             >
               View all
             </button>

@@ -18,6 +18,14 @@ function fromInitial(initial) {
   };
 }
 
+const inputClass =
+  'mt-1 w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40';
+
+const inputStyle = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
+};
+
 export default function WalletForm({ initial, onSubmit, onCancel }) {
   const [form, setForm] = useState(() => fromInitial(initial));
   const [errors, setErrors] = useState({});
@@ -58,47 +66,50 @@ export default function WalletForm({ initial, onSubmit, onCancel }) {
     <Modal open onClose={onCancel} title={isEdit ? 'Edit wallet' : 'Add wallet'} widthClass="max-w-md">
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wallet-label">
-            Label <span className="text-red-400">*</span>
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wallet-label">
+            Label <span className="text-danger">*</span>
           </label>
           <input
             id="wallet-label"
             type="text"
             value={form.label}
             onChange={(e) => update('label', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
             autoFocus
           />
           {errors.label ? (
-            <p className="mt-1 text-xs text-red-400">{errors.label}</p>
+            <p className="mt-1 text-xs text-danger">{errors.label}</p>
           ) : null}
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wallet-address">
-            Address <span className="text-red-400">*</span>
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wallet-address">
+            Address <span className="text-danger">*</span>
           </label>
           <input
             id="wallet-address"
             type="text"
             value={form.address}
             onChange={(e) => update('address', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 font-mono text-xs text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass + ' font-mono text-xs'}
+            style={inputStyle}
           />
           {errors.address ? (
-            <p className="mt-1 text-xs text-red-400">{errors.address}</p>
+            <p className="mt-1 text-xs text-danger">{errors.address}</p>
           ) : null}
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wallet-chain">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wallet-chain">
             Chain type
           </label>
           <select
             id="wallet-chain"
             value={form.chainType}
             onChange={(e) => update('chainType', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           >
             {CHAIN_TYPES.map((c) => (
               <option key={c} value={c}>
@@ -112,13 +123,16 @@ export default function WalletForm({ initial, onSubmit, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-md border border-accent-500/40 bg-accent-500 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200"
+            style={{
+              background: 'linear-gradient(135deg, #F7931A, #E8820A)',
+            }}
           >
             {isEdit ? 'Save changes' : 'Add wallet'}
           </button>

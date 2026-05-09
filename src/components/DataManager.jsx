@@ -183,13 +183,20 @@ function readFileAsText(file) {
 function Row({ title, description, onExport, onImport, exporting, importMessage }) {
   const inputRef = useRef(null);
   return (
-    <div className="rounded-lg border border-surface2 bg-surface p-4">
+    <div
+      className="rounded-2xl p-5"
+      style={{
+        background: 'rgba(13,17,23,0.85)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-slate-100">{title}</h3>
-          <p className="mt-1 text-xs text-slate-400">{description}</p>
+          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          <p className="mt-1 text-xs text-textSecondary">{description}</p>
           {importMessage ? (
-            <p className="mt-2 text-xs text-slate-300">{importMessage}</p>
+            <p className="mt-2 text-xs text-white/80">{importMessage}</p>
           ) : null}
         </div>
         <div className="flex flex-none flex-wrap gap-2">
@@ -197,7 +204,7 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
             type="button"
             onClick={onExport}
             disabled={exporting}
-            className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40 disabled:opacity-50"
+            className="rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
           >
             Export CSV
           </button>
@@ -215,7 +222,11 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
           <button
             type="button"
             onClick={() => inputRef.current && inputRef.current.click()}
-            className="rounded-md border border-accent-500/40 bg-accent-500/20 px-3 py-1.5 text-sm font-medium text-accent-200 hover:bg-accent-500/30 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            style={{
+              backgroundColor: 'rgba(247,147,26,0.15)',
+              border: '1px solid rgba(247,147,26,0.3)',
+            }}
           >
             Import CSV
           </button>
@@ -235,7 +246,7 @@ export default function DataManager({
   onForceReseed,
 }) {
   const { user } = useAuth();
-  const [pendingImport, setPendingImport] = useState(null); // { kind, rows, fileName }
+  const [pendingImport, setPendingImport] = useState(null);
   const [pendingReset, setPendingReset] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [lastMessage, setLastMessage] = useState({
@@ -293,7 +304,6 @@ export default function DataManager({
   async function performReset() {
     if (resetting) return;
     setResetting(true);
-    // Drop everything from local state first so the UI responds immediately.
     setAirdrops([]);
     setWhitelists([]);
     setWallets([]);
@@ -348,9 +358,15 @@ export default function DataManager({
         importMessage={lastMessage.wallets}
       />
 
-      <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4">
-        <h3 className="text-sm font-semibold text-red-300">Danger zone</h3>
-        <p className="mt-1 text-xs text-red-200/80">
+      <div
+        className="rounded-2xl p-5"
+        style={{
+          border: '1px solid rgba(255,71,87,0.3)',
+          backgroundColor: 'rgba(255,71,87,0.05)',
+        }}
+      >
+        <h3 className="text-sm font-semibold text-danger">Danger zone</h3>
+        <p className="mt-1 text-xs text-danger/80">
           Clear all of your DropTrack data in Supabase and reseed the sample
           data. This only affects your account and cannot be undone.
         </p>
@@ -358,7 +374,7 @@ export default function DataManager({
           type="button"
           onClick={() => setPendingReset(true)}
           disabled={resetting}
-          className="mt-3 rounded-md border border-red-500/40 bg-red-600/80 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/60 disabled:opacity-50"
+          className="mt-3 rounded-lg border border-danger/40 bg-danger/80 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-danger focus:outline-none focus:ring-2 focus:ring-danger/60 disabled:opacity-50"
         >
           {resetting ? 'Clearing...' : 'Clear all data'}
         </button>
