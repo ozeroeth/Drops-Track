@@ -18,6 +18,7 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onCancel}
+            autoFocus
             className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
           >
             {cancelLabel}

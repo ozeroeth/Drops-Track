@@ -48,20 +48,29 @@ export function isPast(iso) {
 /**
  * Pick the "primary" deadline for a whitelist entry based on its status.
  *
- * - Applied: the application deadline drives the card (fall back to mint date).
+ * - Applied: the application deadline drives the card, falling back to the
+ *   mint date if apply is empty (both dates are still potentially informative).
  * - Whitelisted: the application phase is done, so the mint date is the next
- *   actionable milestone (fall back to the application deadline).
- * - Minted: the mint date is the reference (fall back to the application date).
- * - Not Selected: the application deadline is the reference.
+ *   actionable milestone, falling back to the application deadline if empty.
+ * - Minted: terminal status; only the mint date is meaningful, so return
+ *   `mint || null` with no cross-fallback to the apply date.
+ * - Not Selected: terminal status; only the apply date is meaningful, so
+ *   return `apply || null` with no cross-fallback to the mint date.
  *
- * Returns an ISO string or null/empty if neither date is set.
+ * Returns an ISO string or null if the relevant date is not set.
  */
 export function primaryWhitelistDeadline(whitelist) {
   if (!whitelist) return null;
   const apply = whitelist.applicationDeadline || '';
   const mint = whitelist.mintDate || '';
   const status = whitelist.status;
-  if (status === 'Whitelisted' || status === 'Minted') {
+  if (status === 'Minted') {
+    return mint || null;
+  }
+  if (status === 'Not Selected') {
+    return apply || null;
+  }
+  if (status === 'Whitelisted') {
     return mint || apply || null;
   }
   return apply || mint || null;

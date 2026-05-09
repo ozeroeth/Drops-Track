@@ -84,6 +84,7 @@ export default function Dashboard({
       return d !== null && d >= 0 && d <= 7;
     }).length;
     const whitelistsThisWeek = whitelists.filter((w) => {
+      if (w.status !== 'Applied' && w.status !== 'Whitelisted') return false;
       const iso = primaryWhitelistDeadline(w);
       const d = daysUntil(iso);
       return d !== null && d >= 0 && d <= 7;
