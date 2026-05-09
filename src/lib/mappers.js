@@ -48,8 +48,20 @@ export function rowToAirdrop(row) {
   };
 }
 
-export function airdropToRow(obj, userId) {
+// `resolveWalletId` is an optional tempId -> real UUID resolver provided by
+// the wallets collection hook. If a user adds a wallet and then adds an
+// airdrop referencing it in the same session, the wallet's local id is still
+// a client-generated tempId. Without the resolver, `wallet_id` would be
+// persisted as that tempId string and the reference would be orphaned after
+// reload. Calling sites that have access to the wallets hook pass it in;
+// seed/import paths that already operate on real UUIDs can omit it.
+export function airdropToRow(obj, userId, resolveWalletId) {
   if (!obj) return null;
+  const walletId = obj.walletId
+    ? typeof resolveWalletId === 'function'
+      ? resolveWalletId(obj.walletId) || obj.walletId
+      : obj.walletId
+    : null;
   const row = {
     user_id: userId,
     name: obj.name || '',
@@ -63,7 +75,7 @@ export function airdropToRow(obj, userId) {
       Number.isFinite(obj.estimatedValueUsd)
         ? obj.estimatedValueUsd
         : null,
-    wallet_id: obj.walletId || null,
+    wallet_id: walletId || null,
     tasks: ensureArray(obj.tasks),
     notes: obj.notes || null,
     link: obj.link || null,
@@ -94,8 +106,13 @@ export function rowToWhitelist(row) {
   };
 }
 
-export function whitelistToRow(obj, userId) {
+export function whitelistToRow(obj, userId, resolveWalletId) {
   if (!obj) return null;
+  const walletId = obj.walletId
+    ? typeof resolveWalletId === 'function'
+      ? resolveWalletId(obj.walletId) || obj.walletId
+      : obj.walletId
+    : null;
   const row = {
     user_id: userId,
     name: obj.name || '',
@@ -103,7 +120,7 @@ export function whitelistToRow(obj, userId) {
     status: obj.status || null,
     application_deadline: obj.applicationDeadline ? obj.applicationDeadline : null,
     mint_date: obj.mintDate ? obj.mintDate : null,
-    wallet_id: obj.walletId || null,
+    wallet_id: walletId || null,
     mint_price: obj.mintPrice || null,
     notes: obj.notes || null,
     link: obj.link || null,

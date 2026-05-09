@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Dashboard from './components/Dashboard.jsx';
 import AirdropList from './components/AirdropList.jsx';
 import WhitelistList from './components/WhitelistList.jsx';
@@ -41,11 +41,33 @@ export default function App() {
   const enabled = !!user;
   const userId = user?.id || null;
 
+  // Wallets is declared first so airdrops/whitelists can consult its
+  // tempId -> real UUID resolver when serializing cross-collection
+  // references. Without this, a wallet added in the same session as an
+  // airdrop that picks it would persist its client tempId as the
+  // airdrop's wallet_id, leaving the reference orphaned after reload.
+  const [wallets, setWallets, walletsMeta] = useSupabaseCollection('wallets', {
+    rowToObj: rowToWallet,
+    objToRow: walletToRow,
+    userId,
+    enabled,
+  });
+
+  const resolveWalletId = walletsMeta.resolveTempId;
+  const airdropToRowWithWallet = useCallback(
+    (obj, uid) => airdropToRow(obj, uid, resolveWalletId),
+    [resolveWalletId],
+  );
+  const whitelistToRowWithWallet = useCallback(
+    (obj, uid) => whitelistToRow(obj, uid, resolveWalletId),
+    [resolveWalletId],
+  );
+
   const [airdrops, setAirdrops, airdropsMeta] = useSupabaseCollection(
     'airdrops',
     {
       rowToObj: rowToAirdrop,
-      objToRow: airdropToRow,
+      objToRow: airdropToRowWithWallet,
       userId,
       enabled,
     },
@@ -54,17 +76,11 @@ export default function App() {
     'whitelists',
     {
       rowToObj: rowToWhitelist,
-      objToRow: whitelistToRow,
+      objToRow: whitelistToRowWithWallet,
       userId,
       enabled,
     },
   );
-  const [wallets, setWallets, walletsMeta] = useSupabaseCollection('wallets', {
-    rowToObj: rowToWallet,
-    objToRow: walletToRow,
-    userId,
-    enabled,
-  });
 
   const seededForUserRef = useRef(null);
 

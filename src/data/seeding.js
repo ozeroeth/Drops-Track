@@ -109,14 +109,13 @@ async function deleteAllUserRows(userId) {
   }
 }
 
-// Best-effort cleanup of rows written during a failed seed attempt. Called
-// from the catch block so the next login can retry from a clean slate.
+// Cleanup of rows written during a failed seed attempt. Errors propagate so
+// callers can decide whether to bail out (partial-seed-detect branch, where
+// stacking fresh inserts on top of leftovers would create orphaned wallets)
+// or continue (outer catch, where we've already failed and just want a best
+// effort to leave no mess).
 async function cleanupPartialSeed(userId) {
-  try {
-    await deleteAllUserRows(userId);
-  } catch (err) {
-    console.error('[seeding] cleanupPartialSeed failed:', err);
-  }
+  await deleteAllUserRows(userId);
 }
 
 export async function seedInitialDataIfEmpty(userId) {
@@ -147,11 +146,24 @@ export async function seedInitialDataIfEmpty(userId) {
     }
 
     if (!arraysEmpty(airdropCount, whitelistCount, walletCount)) {
-      // Partial seed from a prior run. Wipe it and retry cleanly.
+      // Partial seed from a prior run. Wipe it and retry cleanly. If the
+      // wipe itself fails, bail out now: inserting fresh sample rows on
+      // top of the leftover ones would leave orphaned wallets (the new
+      // airdrops/whitelists only reference the new walletIdMap) and
+      // compound on every retry. Leaving user_settings unset means the
+      // next login will try again from the same partial state.
       console.warn(
         '[seeding] detected partial seed state; wiping and retrying',
       );
-      await cleanupPartialSeed(userId);
+      try {
+        await cleanupPartialSeed(userId);
+      } catch (cleanupErr) {
+        console.error(
+          '[seeding] cleanupPartialSeed failed, aborting seed retry:',
+          cleanupErr,
+        );
+        return false;
+      }
     }
 
     const walletIdMap = await insertWalletsAndBuildMap(userId);
@@ -164,8 +176,18 @@ export async function seedInitialDataIfEmpty(userId) {
     return true;
   } catch (err) {
     console.error('[seeding] seedInitialDataIfEmpty failed:', err);
-    // Roll back any partial writes so the next login starts clean.
-    await cleanupPartialSeed(userId);
+    // Best-effort rollback of any partial writes so the next login starts
+    // clean. A failure here is logged but not propagated - we've already
+    // failed the seed and there's no recovery path beyond "try again next
+    // login".
+    try {
+      await cleanupPartialSeed(userId);
+    } catch (cleanupErr) {
+      console.error(
+        '[seeding] cleanupPartialSeed after failure also failed:',
+        cleanupErr,
+      );
+    }
     return false;
   }
 }

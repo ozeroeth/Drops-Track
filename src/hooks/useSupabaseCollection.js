@@ -261,9 +261,19 @@ export default function useSupabaseCollection(
     [refresh],
   );
 
+  // Translate a local (possibly temp) id to the authoritative server UUID
+  // if we've recorded one. Used by sibling hooks whose rows carry a
+  // cross-collection reference to an id that may still be a tempId in local
+  // state. The function reads from the ref so callers always see the freshest
+  // map without having to re-subscribe.
+  const resolveTempId = useCallback((id) => {
+    if (!id) return id;
+    return tempIdMapRef.current.get(id) || id;
+  }, []);
+
   const meta = useMemo(
-    () => ({ loading, error, refresh }),
-    [loading, error, refresh],
+    () => ({ loading, error, refresh, resolveTempId }),
+    [loading, error, refresh, resolveTempId],
   );
 
   return [rows, setRows, meta];
