@@ -23,6 +23,7 @@ const AIRDROP_HEADERS = [
   'notes',
   'link',
   'createdAt',
+  'tags',
 ];
 
 const WHITELIST_HEADERS = [
@@ -37,6 +38,7 @@ const WHITELIST_HEADERS = [
   'notes',
   'link',
   'createdAt',
+  'tags',
 ];
 
 const WALLET_HEADERS = ['id', 'label', 'address', 'chainType'];
@@ -66,6 +68,7 @@ function serializeAirdrop(a) {
     notes: a.notes || '',
     link: a.link || '',
     createdAt: a.createdAt || '',
+    tags: JSON.stringify(Array.isArray(a.tags) ? a.tags : []),
   };
 }
 
@@ -82,6 +85,7 @@ function serializeWhitelist(w) {
     notes: w.notes || '',
     link: w.link || '',
     createdAt: w.createdAt || '',
+    tags: JSON.stringify(Array.isArray(w.tags) ? w.tags : []),
   };
 }
 
@@ -92,6 +96,20 @@ function serializeWallet(w) {
     address: w.address || '',
     chainType: w.chainType || '',
   };
+}
+
+function parseTagsField(raw) {
+  if (raw === undefined || raw === null || raw === '') return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((t) => typeof t === 'string')
+      .map((t) => t.trim())
+      .filter((t) => t !== '');
+  } catch (err) {
+    return [];
+  }
 }
 
 function normalizeAirdropRow(row) {
@@ -125,6 +143,7 @@ function normalizeAirdropRow(row) {
     estimatedValueUsd,
     walletId: row.walletId || '',
     tasks,
+    tags: parseTagsField(row.tags),
     notes: row.notes || '',
     link: row.link || '',
     createdAt: row.createdAt || '',
@@ -141,6 +160,7 @@ function normalizeWhitelistRow(row) {
     mintDate: row.mintDate || '',
     walletId: row.walletId || '',
     mintPrice: row.mintPrice || '',
+    tags: parseTagsField(row.tags),
     notes: row.notes || '',
     link: row.link || '',
     createdAt: row.createdAt || '',
@@ -277,6 +297,7 @@ export default function DataManager({
     removeKey(STORAGE_KEYS.whitelists);
     removeKey(STORAGE_KEYS.wallets);
     removeKey(STORAGE_KEYS.seeded);
+    removeKey(STORAGE_KEYS.customNetworks);
     setAirdrops(sampleAirdrops);
     setWhitelists(sampleWhitelists);
     setWallets(sampleWallets);
@@ -347,7 +368,7 @@ export default function DataManager({
       <ConfirmDialog
         open={pendingReset}
         title="Clear all data?"
-        body="This will wipe all airdrops, whitelists, and wallets from localStorage and reseed the sample data."
+        body="This will wipe all airdrops, whitelists, wallets, and custom networks from localStorage and reseed the sample data."
         confirmLabel="Clear and reseed"
         onConfirm={performReset}
         onCancel={() => setPendingReset(false)}

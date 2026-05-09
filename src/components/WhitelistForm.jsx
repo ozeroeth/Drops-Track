@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
+import TagInput from './TagInput.jsx';
 import { WHITELIST_STATUSES, WHITELIST_TYPES } from '../constants/index.js';
 import { generateId } from '../utils/id.js';
+import { todayIsoLocal } from '../utils/date.js';
 
 function emptyEntry() {
   return {
@@ -13,6 +15,7 @@ function emptyEntry() {
     mintDate: '',
     walletId: '',
     mintPrice: '',
+    tags: [],
     notes: '',
     link: '',
     createdAt: '',
@@ -30,6 +33,9 @@ function fromInitial(initial) {
     mintDate: initial.mintDate || '',
     walletId: initial.walletId || '',
     mintPrice: initial.mintPrice || '',
+    tags: Array.isArray(initial.tags)
+      ? initial.tags.filter((t) => typeof t === 'string' && t.trim() !== '')
+      : [],
     notes: initial.notes || '',
     link: initial.link || '',
     createdAt: initial.createdAt || '',
@@ -57,7 +63,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
       return;
     }
     setError('');
-    const now = new Date().toISOString().slice(0, 10);
+    const now = todayIsoLocal();
     const entry = {
       id: form.id || generateId(),
       name,
@@ -67,6 +73,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
       mintDate: form.mintDate || '',
       walletId: form.walletId || '',
       mintPrice: form.mintPrice.trim(),
+      tags: Array.isArray(form.tags) ? form.tags.slice() : [],
       notes: form.notes,
       link: form.link.trim(),
       createdAt: form.createdAt || now,
@@ -188,6 +195,19 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
               onChange={(e) => update('mintPrice', e.target.value)}
               placeholder="e.g. 0.08 ETH"
               className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-tags">
+            Tags
+          </label>
+          <div className="mt-1">
+            <TagInput
+              id="wf-tags"
+              value={form.tags}
+              onChange={(tags) => update('tags', tags)}
             />
           </div>
         </div>

@@ -9,7 +9,7 @@ function truncateAddress(addr) {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
-export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
+export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onDuplicate }) {
   const primaryIso = primaryWhitelistDeadline(whitelist);
   const overdue =
     isPast(primaryIso) &&
@@ -48,6 +48,16 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
           </button>
           <button
             type="button"
+            onClick={() => onDuplicate && onDuplicate(whitelist)}
+            aria-label="Duplicate"
+            title="Duplicate"
+            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          >
+            <span aria-hidden="true" className="mr-1">&#x29C9;</span>
+            Duplicate
+          </button>
+          <button
+            type="button"
             onClick={() => onDelete(whitelist)}
             className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400/60"
           >
@@ -55,6 +65,19 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
           </button>
         </div>
       </header>
+
+      {Array.isArray(whitelist.tags) && whitelist.tags.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {whitelist.tags.map((tag, i) => (
+            <span
+              key={`${tag}-${i}`}
+              className="inline-flex items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-2 py-0.5 text-xs text-accent-300"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         <DeadlineLabel iso={whitelist.applicationDeadline} label="Apply by" />

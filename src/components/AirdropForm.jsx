@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
+import NetworkSelect from './NetworkSelect.jsx';
+import TagInput from './TagInput.jsx';
 import { NETWORKS, AIRDROP_STATUSES } from '../constants/index.js';
 import { generateId } from '../utils/id.js';
+import { todayIsoLocal } from '../utils/date.js';
 
 function emptyEntry() {
   return {
@@ -14,6 +17,7 @@ function emptyEntry() {
     estimatedValueUsd: '',
     walletId: '',
     tasks: [],
+    tags: [],
     notes: '',
     link: '',
     createdAt: '',
@@ -40,6 +44,9 @@ function fromInitial(initial) {
           label: t.label || '',
           done: !!t.done,
         }))
+      : [],
+    tags: Array.isArray(initial.tags)
+      ? initial.tags.filter((t) => typeof t === 'string' && t.trim() !== '')
       : [],
     notes: initial.notes || '',
     link: initial.link || '',
@@ -104,7 +111,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
       const n = Number(estRaw);
       estimatedValueUsd = Number.isFinite(n) ? n : null;
     }
-    const now = new Date().toISOString().slice(0, 10);
+    const now = todayIsoLocal();
     const entry = {
       id: form.id || generateId(),
       name,
@@ -119,6 +126,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         label: t.label,
         done: !!t.done,
       })),
+      tags: Array.isArray(form.tags) ? form.tags.slice() : [],
       notes: form.notes,
       link: form.link.trim(),
       createdAt: form.createdAt || now,
@@ -163,18 +171,11 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             <label className="block text-xs font-medium text-slate-300" htmlFor="af-network">
               Network
             </label>
-            <select
+            <NetworkSelect
               id="af-network"
               value={form.network}
-              onChange={(e) => update('network', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
-            >
-              {NETWORKS.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => update('network', v)}
+            />
           </div>
         </div>
 
@@ -241,6 +242,19 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-300" htmlFor="af-tags">
+            Tags
+          </label>
+          <div className="mt-1">
+            <TagInput
+              id="af-tags"
+              value={form.tags}
+              onChange={(tags) => update('tags', tags)}
+            />
+          </div>
         </div>
 
         <div>

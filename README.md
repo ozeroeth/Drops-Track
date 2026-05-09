@@ -13,6 +13,11 @@ On first open, DropTrack seeds a handful of realistic sample airdrops, whitelist
 - Airdrop tracker with status, network, deadline, estimated value, per-task checklist, linked wallet, notes, and link.
 - Whitelist tracker for NFT mints, token sales, and beta access, with application deadline and mint date.
 - Dashboard overview with summary counts and deadline alerts (entries due within 3 days are highlighted).
+- Stats tab with total airdrops tracked, success rate, total value collected vs. potential value, best-performing network, most-used wallet, per-status breakdown bars for airdrops and whitelists, and a 12-month activity bar chart.
+- Calendar tab with a month view, prev/next/today navigation, colored deadline dots (red for overdue, orange for due within 3 days, green for upcoming), and a per-day event list covering airdrop deadlines plus whitelist application and mint dates.
+- Custom networks on airdrops: pick **Custom...** in the Network dropdown on the Airdrop form to add your own label. Saved labels show in the dropdown with a small pencil marker and are persisted across reloads.
+- Duplicate entry: every Airdrop and Whitelist card has a Duplicate button that clones the row (fresh id, reset status, `(Copy)` suffix) and shows a short toast so you can quickly fork a template entry.
+- Tag system: Airdrops and Whitelists both accept free-form tags plus a shortlist of suggested tags (`tier-1`, `confirmed`, `low-effort`, `high-risk`, `long-term`, `testnet`). Tags render as chips on each card, and both list pages have a Tag filter that unions the tags present in the collection.
 - Wallet manager for labelling the addresses you apply with (EVM, Solana, or Other).
 - CSV import and export for all three collections, so you can back up or move your data.
 - Dark theme by default.
@@ -69,12 +74,13 @@ To build a production bundle locally, run `npm run build` (output goes to `dist/
 
 ## Data & Privacy
 
-Everything DropTrack knows about you lives in your browser's `localStorage`, under these four keys:
+Everything DropTrack knows about you lives in your browser's `localStorage`, under these five keys:
 
 - `droptrack.airdrops` - the list of airdrop entries
 - `droptrack.whitelists` - the list of whitelist entries
 - `droptrack.wallets` - the list of wallets
 - `droptrack.seeded` - a flag that records whether sample data has been seeded, so it is only seeded once
+- `droptrack.customNetworks` - the list of user-added custom network labels (populated when you pick **Custom...** in the Network dropdown on the Airdrop form, and surfaced back in that dropdown with a pencil marker on later visits)
 
 Things to know:
 
@@ -89,15 +95,17 @@ DropTrack exports and imports a separate CSV file per collection. The first row 
 **Airdrops** (`airdrops.csv`)
 
 ```
-id,name,logoUrl,network,status,deadline,estimatedValueUsd,walletId,tasks,notes,link,createdAt
+id,name,logoUrl,network,status,deadline,estimatedValueUsd,walletId,tasks,notes,link,createdAt,tags
 ```
 
 The `tasks` column is a JSON-encoded array of `{ id, label, done }` objects. Keep it verbatim on import, quotes and all, or the checklist will fail to parse.
 
+The `tags` column follows the same pattern as `tasks`: a JSON-encoded array of strings (for example `["tier-1","confirmed"]`). Importing an older CSV that does not include a `tags` column still succeeds; every row simply loads with `tags` defaulting to an empty array.
+
 **Whitelists** (`whitelists.csv`)
 
 ```
-id,name,type,status,applicationDeadline,mintDate,walletId,mintPrice,notes,link,createdAt
+id,name,type,status,applicationDeadline,mintDate,walletId,mintPrice,notes,link,createdAt,tags
 ```
 
 **Wallets** (`wallets.csv`)

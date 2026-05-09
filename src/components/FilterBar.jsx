@@ -62,6 +62,14 @@ export default function FilterBar({ filters, setFilters, options, defaults }) {
           options={options.type}
         />
       ) : null}
+      {options.tag ? (
+        <Select
+          label="Tag"
+          value={filters.tag}
+          onChange={(v) => update('tag', v)}
+          options={options.tag}
+        />
+      ) : null}
       {options.sortBy ? (
         <Select
           label="Sort by"

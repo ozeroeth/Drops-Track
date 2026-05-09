@@ -2,12 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import { isExpiringSoon, isPast } from '../utils/date.js';
-import { NETWORKS } from '../constants/index.js';
-
-function networkLabel(id) {
-  const match = NETWORKS.find((n) => n.id === id);
-  return match ? match.label : id || 'Other';
-}
+import { resolveNetworkLabel } from '../utils/networks.js';
 
 function formatUsd(value) {
   if (typeof value !== 'number' || Number.isNaN(value)) return '\u2014';
@@ -40,6 +35,7 @@ export default function AirdropCard({
   wallet,
   onEdit,
   onDelete,
+  onDuplicate,
   onToggleTask,
 }) {
   const [imgFailed, setImgFailed] = useState(false);
@@ -80,7 +76,7 @@ export default function AirdropCard({
             </h3>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-md border border-surface2 bg-surface2 px-2 py-0.5 text-xs text-slate-300">
-                {networkLabel(airdrop.network)}
+                {resolveNetworkLabel(airdrop.network)}
               </span>
               <StatusBadge status={airdrop.status} />
             </div>
@@ -96,6 +92,16 @@ export default function AirdropCard({
           </button>
           <button
             type="button"
+            onClick={() => onDuplicate && onDuplicate(airdrop)}
+            aria-label="Duplicate"
+            title="Duplicate"
+            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          >
+            <span aria-hidden="true" className="mr-1">&#x29C9;</span>
+            Duplicate
+          </button>
+          <button
+            type="button"
             onClick={() => onDelete(airdrop)}
             className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400/60"
           >
@@ -103,6 +109,19 @@ export default function AirdropCard({
           </button>
         </div>
       </header>
+
+      {Array.isArray(airdrop.tags) && airdrop.tags.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {airdrop.tags.map((tag, i) => (
+            <span
+              key={`${tag}-${i}`}
+              className="inline-flex items-center rounded-full border border-accent-500/30 bg-accent-500/10 px-2 py-0.5 text-xs text-accent-300"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         <DeadlineLabel iso={airdrop.deadline} label="Deadline" />

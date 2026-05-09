@@ -1,20 +1,34 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SearchBar from './SearchBar.jsx';
 import FilterBar from './FilterBar.jsx';
 import EmptyState from './EmptyState.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import WhitelistCard from './WhitelistCard.jsx';
 import WhitelistForm from './WhitelistForm.jsx';
+import Toast from './Toast.jsx';
 import { WHITELIST_STATUSES, WHITELIST_TYPES } from '../constants/index.js';
-import { daysUntil } from '../utils/date.js';
+import { daysUntil, todayIsoLocal } from '../utils/date.js';
+import { generateId } from '../utils/id.js';
 
 const DEFAULT_FILTERS = {
   status: 'All',
   type: 'All',
+  tag: 'All',
   sortBy: 'applicationAsc',
 };
 
-function buildFilterOptions() {
+function collectTags(whitelists) {
+  const set = new Set();
+  for (const w of whitelists) {
+    if (!Array.isArray(w.tags)) continue;
+    for (const t of w.tags) {
+      if (typeof t === 'string' && t.trim() !== '') set.add(t);
+    }
+  }
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+function buildFilterOptions(whitelists) {
   return {
     status: [
       { value: 'All', label: 'Status: All' },
@@ -23,6 +37,10 @@ function buildFilterOptions() {
     type: [
       { value: 'All', label: 'Type: All' },
       ...WHITELIST_TYPES.map((t) => ({ value: t, label: t })),
+    ],
+    tag: [
+      { value: 'All', label: 'Tag: All' },
+      ...collectTags(whitelists).map((t) => ({ value: t, label: t })),
     ],
     sortBy: [
       { value: 'applicationAsc', label: 'Sort: Application deadline asc' },
@@ -37,14 +55,30 @@ export default function WhitelistList({ whitelists, setWhitelists, wallets }) {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [editing, setEditing] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [toast, setToast] = useState({ message: '', nonce: 0 });
 
-  const filterOptions = useMemo(() => buildFilterOptions(), []);
+  const filterOptions = useMemo(
+    () => buildFilterOptions(whitelists),
+    [whitelists],
+  );
+
+  useEffect(() => {
+    if (filters.tag === 'All') return;
+    const tags = collectTags(whitelists);
+    if (!tags.includes(filters.tag)) {
+      setFilters((prev) => ({ ...prev, tag: 'All' }));
+    }
+  }, [whitelists, filters.tag]);
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
     let out = whitelists.filter((w) => {
       if (filters.status !== 'All' && w.status !== filters.status) return false;
       if (filters.type !== 'All' && w.type !== filters.type) return false;
+      if (filters.tag !== 'All') {
+        const tags = Array.isArray(w.tags) ? w.tags : [];
+        if (!tags.includes(filters.tag)) return false;
+      }
       if (q) {
         const name = (w.name || '').toLowerCase();
         const notes = (w.notes || '').toLowerCase();
@@ -97,6 +131,27 @@ export default function WhitelistList({ whitelists, setWhitelists, wallets }) {
     setPendingDelete(null);
   }
 
+  function handleDuplicate(source) {
+    if (!source) return;
+    const now = todayIsoLocal();
+    const dup = {
+      id: generateId(),
+      name: `${source.name || ''} (Copy)`,
+      type: source.type || WHITELIST_TYPES[0] || 'NFT mint',
+      status: 'Applied',
+      applicationDeadline: source.applicationDeadline || '',
+      mintDate: source.mintDate || '',
+      walletId: source.walletId || '',
+      mintPrice: source.mintPrice || '',
+      tags: Array.isArray(source.tags) ? source.tags.slice() : [],
+      notes: source.notes || '',
+      link: source.link || '',
+      createdAt: now,
+    };
+    setWhitelists((prev) => [dup, ...prev]);
+    setToast((prev) => ({ message: 'Entry duplicated!', nonce: prev.nonce + 1 }));
+  }
+
   const walletById = useMemo(() => {
     const map = new Map();
     for (const w of wallets) map.set(w.id, w);
@@ -147,6 +202,7 @@ export default function WhitelistList({ whitelists, setWhitelists, wallets }) {
               wallet={walletById.get(w.walletId) || null}
               onEdit={(entry) => setEditing(entry)}
               onDelete={(entry) => setPendingDelete(entry)}
+              onDuplicate={handleDuplicate}
             />
           ))}
         </div>
@@ -173,6 +229,8 @@ export default function WhitelistList({ whitelists, setWhitelists, wallets }) {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setPendingDelete(null)}
       />
+
+      <Toast message={toast.message} nonce={toast.nonce} />
     </div>
   );
 }

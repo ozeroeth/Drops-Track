@@ -12,11 +12,15 @@ import AirdropList from './components/AirdropList.jsx';
 import WhitelistList from './components/WhitelistList.jsx';
 import WalletManager from './components/WalletManager.jsx';
 import DataManager from './components/DataManager.jsx';
+import Stats from './components/Stats.jsx';
+import Calendar from './components/Calendar.jsx';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'airdrops', label: 'Airdrops' },
   { id: 'whitelists', label: 'Whitelists' },
+  { id: 'calendar', label: 'Calendar' },
+  { id: 'stats', label: 'Stats' },
   { id: 'wallets', label: 'Wallets' },
   { id: 'data', label: 'Data' },
 ];
@@ -103,6 +107,16 @@ export default function App() {
           <WhitelistList
             whitelists={whitelists}
             setWhitelists={setWhitelists}
+            wallets={wallets}
+          />
+        ) : null}
+        {activeTab === 'calendar' ? (
+          <Calendar airdrops={airdrops} whitelists={whitelists} />
+        ) : null}
+        {activeTab === 'stats' ? (
+          <Stats
+            airdrops={airdrops}
+            whitelists={whitelists}
             wallets={wallets}
           />
         ) : null}

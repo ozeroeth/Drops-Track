@@ -3,7 +3,7 @@ import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import EmptyState from './EmptyState.jsx';
 import { daysUntil, isExpiringSoon, primaryWhitelistDeadline } from '../utils/date.js';
-import { NETWORKS } from '../constants/index.js';
+import { resolveNetworkLabel } from '../utils/networks.js';
 
 function formatUsd(value) {
   if (typeof value !== 'number' || Number.isNaN(value)) return '\u2014';
@@ -16,11 +16,6 @@ function formatUsd(value) {
   } catch (err) {
     return `$${Math.round(value)}`;
   }
-}
-
-function networkLabel(id) {
-  const match = NETWORKS.find((n) => n.id === id);
-  return match ? match.label : id || '';
 }
 
 function SummaryCard({ title, value, hint, onClick }) {
@@ -187,7 +182,7 @@ export default function Dashboard({
                   title={a.name}
                   subtitle={
                     <span className="flex items-center gap-2">
-                      <span>{networkLabel(a.network)}</span>
+                      <span>{resolveNetworkLabel(a.network)}</span>
                       <StatusBadge status={a.status} />
                     </span>
                   }
