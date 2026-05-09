@@ -17,11 +17,25 @@ DropTrack is a personal productivity tool for keeping tabs on DeFi/NFT airdrops 
 - Calendar tab with a month view, prev/next/today navigation, colored deadline dots (red for overdue, orange for due within 3 days, green for upcoming), and a per-day event list covering airdrop deadlines plus whitelist application and mint dates.
 - Custom networks on airdrops: pick **Custom...** in the Network dropdown on the Airdrop form to add your own label. Saved labels show in the dropdown with a small pencil marker and are persisted across reloads.
 - Duplicate entry: every Airdrop and Whitelist card has a Duplicate button that clones the row (fresh id, reset status, `(Copy)` suffix) and shows a short toast so you can quickly fork a template entry.
+- Card action menu: every Airdrop and Whitelist card shows a gear icon (top-right) that opens a dropdown with Edit, Duplicate, and Delete options. Replaces the previous inline text buttons for a cleaner card layout.
 - Tag system: Airdrops and Whitelists both accept free-form tags plus a shortlist of suggested tags (`tier-1`, `confirmed`, `low-effort`, `high-risk`, `long-term`, `testnet`). Tags render as chips on each card, and both list pages have a Tag filter that unions the tags present in the collection.
+- Twitter/X URL: both Airdrops and Whitelists accept an optional Twitter/X profile or post URL. When filled, a clickable X icon appears on the card that opens the link in a new tab.
 - Wallet manager for labelling the addresses you apply with (EVM, Solana, or Other).
 - CSV import and export for all three collections, so you can back up or move your data.
 - Dark theme by default.
 - Mobile responsive layout that collapses the card grid on small screens.
+
+## Design
+
+DropTrack uses a "Crypto Premium" visual theme inspired by high-end DeFi dashboards:
+
+- Dark background (#080B14) with scattered low-opacity crypto emoji stickers and a subtle animated gradient orb.
+- Glassmorphism cards with backdrop blur, semi-transparent backgrounds, and soft border highlights.
+- Bitcoin orange (#F7931A) primary accent, Solana purple (#9945FF) secondary, and cyan (#00D1FF) tertiary.
+- Typography: Space Grotesk for headings and numbers, Inter for body text.
+- Responsive layout: fixed bottom navigation bar on mobile (<=640px), horizontal top tabs on desktop.
+- Status badges with colored dots, network pills with per-chain colors, and animated card entrances.
+- All animations respect the `prefers-reduced-motion` media query.
 
 ## Tech Stack
 
@@ -185,17 +199,19 @@ DropTrack exports and imports a separate CSV file per collection. The first row 
 **Airdrops** (`airdrops.csv`)
 
 ```
-id,name,logoUrl,network,status,deadline,estimatedValueUsd,walletId,tasks,notes,link,createdAt,tags
+id,name,logoUrl,network,status,deadline,estimatedValueUsd,walletId,tasks,notes,link,createdAt,tags,twitterUrl
 ```
 
 The `tasks` column is a JSON-encoded array of `{ id, label, done }` objects. Keep it verbatim on import, quotes and all, or the checklist will fail to parse.
 
 The `tags` column follows the same pattern as `tasks`: a JSON-encoded array of strings (for example `["tier-1","confirmed"]`). Importing an older CSV that does not include a `tags` column still succeeds; every row simply loads with `tags` defaulting to an empty array.
 
+The `twitterUrl` column is optional. Importing an older CSV that does not include it still works; entries load with an empty Twitter/X field.
+
 **Whitelists** (`whitelists.csv`)
 
 ```
-id,name,type,status,applicationDeadline,mintDate,walletId,mintPrice,notes,link,createdAt,tags
+id,name,type,status,applicationDeadline,mintDate,walletId,mintPrice,notes,link,createdAt,tags,twitterUrl
 ```
 
 **Wallets** (`wallets.csv`)
