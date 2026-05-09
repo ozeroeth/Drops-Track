@@ -1,4 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import useLocalStorageState from './hooks/useLocalStorageState.js';
+import { readJSON, writeJSON } from './utils/storage.js';
+import { STORAGE_KEYS } from './constants/index.js';
+import {
+  sampleAirdrops,
+  sampleWhitelists,
+  sampleWallets,
+} from './data/sampleData.js';
+import Dashboard from './components/Dashboard.jsx';
+import AirdropList from './components/AirdropList.jsx';
+import WhitelistList from './components/WhitelistList.jsx';
+import WalletManager from './components/WalletManager.jsx';
+import DataManager from './components/DataManager.jsx';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -10,18 +23,45 @@ const TABS = [
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const activeLabel =
-    TABS.find((tab) => tab.id === activeTab)?.label ?? 'Dashboard';
+
+  const [airdrops, setAirdrops] = useLocalStorageState(
+    STORAGE_KEYS.airdrops,
+    [],
+  );
+  const [whitelists, setWhitelists] = useLocalStorageState(
+    STORAGE_KEYS.whitelists,
+    [],
+  );
+  const [wallets, setWallets] = useLocalStorageState(STORAGE_KEYS.wallets, []);
+
+  const seededRef = useRef(false);
+
+  useEffect(() => {
+    if (seededRef.current) return;
+    seededRef.current = true;
+    const seeded = readJSON(STORAGE_KEYS.seeded, null);
+    if (seeded) return;
+    setAirdrops(sampleAirdrops);
+    setWhitelists(sampleWhitelists);
+    setWallets(sampleWallets);
+    writeJSON(STORAGE_KEYS.seeded, '1');
+  }, [setAirdrops, setWhitelists, setWallets]);
 
   return (
     <div className="min-h-screen bg-bg text-slate-100">
-      <header className="border-b border-surface2 bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <h1 className="text-xl font-semibold tracking-tight">
-            <span className="text-accent-400">Drop</span>Track
+      <header className="sticky top-0 z-20 border-b border-surface2 bg-surface/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-accent-400" />
+            <span>
+              <span className="text-accent-400">Drop</span>Track
+            </span>
           </h1>
         </div>
-        <nav className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 pb-3">
+        <nav
+          className="mx-auto flex max-w-6xl gap-1 overflow-x-auto whitespace-nowrap px-4 pb-3"
+          aria-label="Primary"
+        >
           {TABS.map((tab) => {
             const isActive = tab.id === activeTab;
             return (
@@ -29,8 +69,9 @@ export default function App() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
+                aria-current={isActive ? 'page' : undefined}
                 className={
-                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors ' +
+                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500/40 ' +
                   (isActive
                     ? 'bg-accent-500 text-slate-900'
                     : 'text-slate-300 hover:bg-surface2 hover:text-slate-100')
@@ -42,10 +83,47 @@ export default function App() {
           })}
         </nav>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <p className="text-slate-300">
-          Active tab: <span className="font-semibold">{activeLabel}</span>
-        </p>
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        {activeTab === 'dashboard' ? (
+          <Dashboard
+            airdrops={airdrops}
+            whitelists={whitelists}
+            onJumpToAirdrops={() => setActiveTab('airdrops')}
+            onJumpToWhitelists={() => setActiveTab('whitelists')}
+          />
+        ) : null}
+        {activeTab === 'airdrops' ? (
+          <AirdropList
+            airdrops={airdrops}
+            setAirdrops={setAirdrops}
+            wallets={wallets}
+          />
+        ) : null}
+        {activeTab === 'whitelists' ? (
+          <WhitelistList
+            whitelists={whitelists}
+            setWhitelists={setWhitelists}
+            wallets={wallets}
+          />
+        ) : null}
+        {activeTab === 'wallets' ? (
+          <WalletManager
+            wallets={wallets}
+            setWallets={setWallets}
+            airdrops={airdrops}
+            whitelists={whitelists}
+          />
+        ) : null}
+        {activeTab === 'data' ? (
+          <DataManager
+            airdrops={airdrops}
+            setAirdrops={setAirdrops}
+            whitelists={whitelists}
+            setWhitelists={setWhitelists}
+            wallets={wallets}
+            setWallets={setWallets}
+          />
+        ) : null}
       </main>
     </div>
   );
