@@ -5,22 +5,51 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#0b1020',
-        surface: '#0f172a',
-        surface2: '#1e293b',
-        accent: {
-          DEFAULT: '#34d399',
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
+        bg: '#080B14',
+        surface: '#0D1117',
+        surfaceBorder: '#1C2333',
+        primary: '#F7931A',
+        secondary: '#9945FF',
+        tertiary: '#00D1FF',
+        success: '#00C896',
+        warning: '#FFB800',
+        danger: '#FF4757',
+        textPrimary: '#FFFFFF',
+        textSecondary: '#8892A4',
+      },
+      fontFamily: {
+        heading: ['Space Grotesk', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+      },
+      keyframes: {
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        cardEntrance: {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        pulseRing: {
+          '0%': { transform: 'scale(1)', opacity: '0.4' },
+          '100%': { transform: 'scale(1.15)', opacity: '0' },
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        orbPulse: {
+          '0%': { transform: 'scale(1)', opacity: '0.06' },
+          '50%': { transform: 'scale(1.2)', opacity: '0.09' },
+          '100%': { transform: 'scale(1)', opacity: '0.06' },
+        },
+      },
+      animation: {
+        'fade-in-up': 'fadeInUp 0.4s ease-out forwards',
+        'card-entrance': 'cardEntrance 0.5s ease-out forwards',
+        'pulse-ring': 'pulseRing 1.5s ease-out infinite',
+        shimmer: 'shimmer 2s ease-in-out infinite',
+        'orb-pulse': 'orbPulse 4s ease-in-out infinite',
       },
     },
   },
