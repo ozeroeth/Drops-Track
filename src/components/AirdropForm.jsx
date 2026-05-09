@@ -56,6 +56,14 @@ function fromInitial(initial) {
   };
 }
 
+const inputClass =
+  'mt-1 w-full rounded-[10px] border px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
+
+const inputStyle = {
+  background: 'rgba(255,255,255,0.04)',
+  borderColor: 'rgba(255,255,255,0.08)',
+};
+
 export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
   const [form, setForm] = useState(() => fromInitial(initial));
   const [newTask, setNewTask] = useState('');
@@ -143,23 +151,24 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
     <Modal open onClose={onCancel} title={isEdit ? 'Edit airdrop' : 'Add airdrop'}>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="af-name">
-            Name <span className="text-red-400">*</span>
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-name">
+            Name <span className="text-danger">*</span>
           </label>
           <input
             id="af-name"
             type="text"
             value={form.name}
             onChange={(e) => update('name', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
             autoFocus
           />
-          {error ? <p className="mt-1 text-xs text-red-400">{error}</p> : null}
+          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="af-logo">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-logo">
               Logo URL
             </label>
             <input
@@ -167,11 +176,12 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               type="url"
               value={form.logoUrl}
               onChange={(e) => update('logoUrl', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="af-network">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-network">
               Network
             </label>
             <NetworkSelect
@@ -184,14 +194,15 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="af-status">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-status">
               Status
             </label>
             <select
               id="af-status"
               value={form.status}
               onChange={(e) => update('status', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             >
               {AIRDROP_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -201,7 +212,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="af-deadline">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-deadline">
               Deadline
             </label>
             <input
@@ -209,11 +220,12 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               type="date"
               value={form.deadline}
               onChange={(e) => update('deadline', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="af-value">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-value">
               Est. value (USD)
             </label>
             <input
@@ -223,20 +235,22 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               min="0"
               value={form.estimatedValueUsd}
               onChange={(e) => update('estimatedValueUsd', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="af-wallet">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-wallet">
             Wallet
           </label>
           <select
             id="af-wallet"
             value={form.walletId}
             onChange={(e) => update('walletId', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           >
             <option value="">{'\u2014 None \u2014'}</option>
             {wallets.map((w) => (
@@ -248,7 +262,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="af-tags">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-tags">
             Tags
           </label>
           <div className="mt-1">
@@ -261,10 +275,10 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         </div>
 
         <div>
-          <div className="block text-xs font-medium text-slate-300">Tasks</div>
+          <div className="block text-xs font-medium text-textSecondary">Tasks</div>
           <div className="mt-1 space-y-1.5">
             {form.tasks.length === 0 ? (
-              <p className="text-xs text-slate-500">No tasks yet.</p>
+              <p className="text-xs text-textSecondary">No tasks yet.</p>
             ) : (
               form.tasks.map((t) => (
                 <div key={t.id} className="flex items-center gap-2">
@@ -272,7 +286,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
                     type="checkbox"
                     checked={!!t.done}
                     onChange={() => toggleTaskDone(t.id)}
-                    className="h-4 w-4 flex-none rounded border-surface2 bg-surface2 text-accent-500 focus:ring-2 focus:ring-accent-500/40"
+                    className="h-4 w-4 flex-none rounded border-surfaceBorder bg-surface text-primary focus:ring-2 focus:ring-primary/20"
                   />
                   <input
                     type="text"
@@ -285,12 +299,14 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
                         ),
                       }))
                     }
-                    className="flex-1 rounded-md border border-surface2 bg-surface px-2 py-1 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+                    className="flex-1 rounded-[10px] border px-2 py-1 text-sm text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    style={inputStyle}
                   />
                   <button
                     type="button"
                     onClick={() => removeTask(t.id)}
-                    className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+                    className="rounded-[10px] border px-2 py-1 text-xs text-textSecondary hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
                   >
                     Remove
                   </button>
@@ -309,12 +325,13 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
                     addTask();
                   }
                 }}
-                className="flex-1 rounded-md border border-surface2 bg-surface px-2 py-1 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+                className="flex-1 rounded-[10px] border px-2 py-1 text-sm text-white placeholder-[#4A5568] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                style={inputStyle}
               />
               <button
                 type="button"
                 onClick={addTask}
-                className="rounded-md border border-accent-500/40 bg-accent-500/20 px-2 py-1 text-xs font-medium text-accent-200 hover:bg-accent-500/30 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+                className="rounded-[10px] border border-primary/40 bg-primary/20 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 Add
               </button>
@@ -323,7 +340,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="af-notes">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-notes">
             Notes
           </label>
           <textarea
@@ -331,12 +348,13 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             rows={3}
             value={form.notes}
             onChange={(e) => update('notes', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="af-link">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-link">
             Link
           </label>
           <input
@@ -344,12 +362,13 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             type="url"
             value={form.link}
             onChange={(e) => update('link', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="af-twitter">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-twitter">
             <span className="inline-flex items-center gap-1.5">
               <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>&#x1D54F;</span> Twitter/X
             </span>
@@ -360,7 +379,8 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             value={form.twitterUrl}
             onChange={(e) => update('twitterUrl', e.target.value)}
             placeholder="https://x.com/..."
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           />
         </div>
 
@@ -368,13 +388,15 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-xl border px-3 py-1.5 text-sm text-textSecondary transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'transparent' }}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-md border border-accent-500/40 bg-accent-500 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-[0_4px_20px_rgba(247,147,26,0.3)] focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{ background: 'linear-gradient(135deg, #F7931A, #E8820A)' }}
           >
             {isEdit ? 'Save changes' : 'Add airdrop'}
           </button>

@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
+  const triggerRef = useRef(null);
+  const firstItemRef = useRef(null);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -16,6 +18,7 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
     function handleEscape(e) {
       if (e.key === 'Escape') {
         setOpen(false);
+        if (triggerRef.current) triggerRef.current.focus();
       }
     }
 
@@ -27,8 +30,15 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (open && firstItemRef.current) {
+      firstItemRef.current.focus();
+    }
+  }, [open]);
+
   function handleAction(cb) {
     setOpen(false);
+    if (triggerRef.current) triggerRef.current.focus();
     if (typeof cb === 'function') cb();
   }
 
@@ -36,14 +46,18 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
     <div className="relative" ref={containerRef}>
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => setOpen((prev) => !prev)}
         className="flex h-8 w-8 items-center justify-center rounded-lg text-[#8892A4] transition-colors hover:text-white focus:outline-none"
         aria-label="Actions"
+        aria-haspopup="true"
+        aria-expanded={open}
       >
         <span className="text-sm">{'\u2699\uFE0F'}</span>
       </button>
       {open ? (
         <div
+          role="menu"
           className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-[10px] py-1 shadow-xl"
           style={{
             background: '#1C2333',
@@ -52,6 +66,8 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
         >
           <button
             type="button"
+            ref={firstItemRef}
+            role="menuitem"
             onClick={() => handleAction(onEdit)}
             className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/5"
           >
@@ -60,6 +76,7 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
           </button>
           <button
             type="button"
+            role="menuitem"
             onClick={() => handleAction(onDuplicate)}
             className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/5"
           >
@@ -68,6 +85,7 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
           </button>
           <button
             type="button"
+            role="menuitem"
             onClick={() => handleAction(onDelete)}
             className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-white/5"
             style={{ color: '#FF4757' }}

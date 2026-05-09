@@ -44,6 +44,14 @@ function fromInitial(initial) {
   };
 }
 
+const inputClass =
+  'mt-1 w-full rounded-[10px] border px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
+
+const inputStyle = {
+  background: 'rgba(255,255,255,0.04)',
+  borderColor: 'rgba(255,255,255,0.08)',
+};
+
 export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) {
   const [form, setForm] = useState(() => fromInitial(initial));
   const [error, setError] = useState('');
@@ -90,30 +98,32 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
     <Modal open onClose={onCancel} title={isEdit ? 'Edit whitelist' : 'Add whitelist'}>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-name">
-            Name <span className="text-red-400">*</span>
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-name">
+            Name <span className="text-danger">*</span>
           </label>
           <input
             id="wf-name"
             type="text"
             value={form.name}
             onChange={(e) => update('name', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
             autoFocus
           />
-          {error ? <p className="mt-1 text-xs text-red-400">{error}</p> : null}
+          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="wf-type">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-type">
               Type
             </label>
             <select
               id="wf-type"
               value={form.type}
               onChange={(e) => update('type', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             >
               {WHITELIST_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -123,14 +133,15 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="wf-status">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-status">
               Status
             </label>
             <select
               id="wf-status"
               value={form.status}
               onChange={(e) => update('status', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             >
               {WHITELIST_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -143,7 +154,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="wf-apply">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-apply">
               Application deadline
             </label>
             <input
@@ -151,11 +162,12 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
               type="date"
               value={form.applicationDeadline}
               onChange={(e) => update('applicationDeadline', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="wf-mint">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-mint">
               Mint date
             </label>
             <input
@@ -163,21 +175,23 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
               type="date"
               value={form.mintDate}
               onChange={(e) => update('mintDate', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="wf-wallet">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-wallet">
               Wallet
             </label>
             <select
               id="wf-wallet"
               value={form.walletId}
               onChange={(e) => update('walletId', e.target.value)}
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             >
               <option value="">{'\u2014 None \u2014'}</option>
               {wallets.map((w) => (
@@ -188,7 +202,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-300" htmlFor="wf-price">
+            <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-price">
               Mint price
             </label>
             <input
@@ -197,13 +211,14 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
               value={form.mintPrice}
               onChange={(e) => update('mintPrice', e.target.value)}
               placeholder="e.g. 0.08 ETH"
-              className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-tags">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-tags">
             Tags
           </label>
           <div className="mt-1">
@@ -216,7 +231,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-notes">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-notes">
             Notes
           </label>
           <textarea
@@ -224,12 +239,13 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             rows={3}
             value={form.notes}
             onChange={(e) => update('notes', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-link">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-link">
             Link
           </label>
           <input
@@ -237,12 +253,13 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             type="url"
             value={form.link}
             onChange={(e) => update('link', e.target.value)}
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300" htmlFor="wf-twitter">
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-twitter">
             <span className="inline-flex items-center gap-1.5">
               <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>&#x1D54F;</span> Twitter/X
             </span>
@@ -253,7 +270,8 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             value={form.twitterUrl}
             onChange={(e) => update('twitterUrl', e.target.value)}
             placeholder="https://x.com/..."
-            className="mt-1 w-full rounded-md border border-surface2 bg-surface px-3 py-2 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className={inputClass}
+            style={inputStyle}
           />
         </div>
 
@@ -261,13 +279,15 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-xl border px-3 py-1.5 text-sm text-textSecondary transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'transparent' }}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-md border border-accent-500/40 bg-accent-500 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-[0_4px_20px_rgba(247,147,26,0.3)] focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{ background: 'linear-gradient(135deg, #F7931A, #E8820A)' }}
           >
             {isEdit ? 'Save changes' : 'Add whitelist'}
           </button>
