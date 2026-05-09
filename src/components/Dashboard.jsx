@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import EmptyState from './EmptyState.jsx';
-import { daysUntil, isExpiringSoon } from '../utils/date.js';
+import { daysUntil, isExpiringSoon, primaryWhitelistDeadline } from '../utils/date.js';
 import { NETWORKS } from '../constants/index.js';
 
 function formatUsd(value) {
@@ -84,7 +84,7 @@ export default function Dashboard({
       return d !== null && d >= 0 && d <= 7;
     }).length;
     const whitelistsThisWeek = whitelists.filter((w) => {
-      const iso = w.applicationDeadline || w.mintDate;
+      const iso = primaryWhitelistDeadline(w);
       const d = daysUntil(iso);
       return d !== null && d >= 0 && d <= 7;
     }).length;
@@ -115,12 +115,15 @@ export default function Dashboard({
   const upcomingWhitelists = useMemo(() => {
     return whitelists
       .slice()
-      .filter((w) => (w.applicationDeadline || w.mintDate))
+      .filter((w) => w.status === 'Applied' || w.status === 'Whitelisted')
+      .filter((w) => {
+        const iso = primaryWhitelistDeadline(w);
+        const d = daysUntil(iso);
+        return d !== null && d >= 0;
+      })
       .sort((a, b) => {
-        const ai = a.applicationDeadline || a.mintDate;
-        const bi = b.applicationDeadline || b.mintDate;
-        const da = daysUntil(ai);
-        const db = daysUntil(bi);
+        const da = daysUntil(primaryWhitelistDeadline(a));
+        const db = daysUntil(primaryWhitelistDeadline(b));
         if (da === null && db === null) return 0;
         if (da === null) return 1;
         if (db === null) return -1;
@@ -217,8 +220,11 @@ export default function Dashboard({
           ) : (
             <ul className="space-y-2">
               {upcomingWhitelists.map((w) => {
-                const iso = w.applicationDeadline || w.mintDate;
-                const label = w.applicationDeadline ? 'Apply by' : 'Mint';
+                const iso = primaryWhitelistDeadline(w);
+                const label =
+                  w.status === 'Whitelisted' || w.status === 'Minted'
+                    ? 'Mint'
+                    : 'Apply by';
                 return (
                   <UpcomingItem
                     key={w.id}

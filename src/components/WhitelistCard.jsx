@@ -1,7 +1,7 @@
 import React from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
-import { isExpiringSoon, isPast } from '../utils/date.js';
+import { isExpiringSoon, isPast, primaryWhitelistDeadline } from '../utils/date.js';
 
 function truncateAddress(addr) {
   if (!addr || typeof addr !== 'string') return '';
@@ -10,7 +10,7 @@ function truncateAddress(addr) {
 }
 
 export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
-  const primaryIso = whitelist.applicationDeadline || whitelist.mintDate;
+  const primaryIso = primaryWhitelistDeadline(whitelist);
   const overdue =
     isPast(primaryIso) &&
     (whitelist.status === 'Applied' || whitelist.status === 'Whitelisted');
