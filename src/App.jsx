@@ -22,16 +22,26 @@ import {
 import {
   seedInitialDataIfEmpty,
 } from './data/seeding.js';
+import {
+  LayoutDashboard,
+  Droplets,
+  ListChecks,
+  CalendarDays,
+  BarChart2,
+  Wallet,
+  Settings as SettingsIcon,
+  Database,
+} from './components/icons.jsx';
 
 const TABS = [
-  { id: 'dashboard', label: 'Dashboard', icon: '\u{1F4CA}' },
-  { id: 'airdrops', label: 'Airdrops', icon: '\u{1FA82}' },
-  { id: 'whitelists', label: 'Whitelists', icon: '\u{1F4CB}' },
-  { id: 'calendar', label: 'Calendar', icon: '\u{1F4C5}' },
-  { id: 'stats', label: 'Stats', icon: '\u{1F4C8}' },
-  { id: 'wallets', label: 'Wallets', icon: '\u{1F45B}' },
-  { id: 'settings', label: 'Settings', icon: '\u2699\uFE0F' },
-  { id: 'data', label: 'Data', icon: '\u{1F4BE}' },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'airdrops', label: 'Airdrops', icon: Droplets },
+  { id: 'whitelists', label: 'Whitelists', icon: ListChecks },
+  { id: 'calendar', label: 'Calendar', icon: CalendarDays },
+  { id: 'stats', label: 'Stats', icon: BarChart2 },
+  { id: 'wallets', label: 'Wallets', icon: Wallet },
+  { id: 'settings', label: 'Settings', icon: SettingsIcon },
+  { id: 'data', label: 'Data', icon: Database },
 ];
 
 export default function App() {
@@ -203,6 +213,14 @@ export default function App() {
         </nav>
       </header>
 
+      {/* Mobile creator signature (just above the bottom nav) */}
+      <div
+        className="fixed inset-x-0 z-20 flex justify-center pointer-events-none sm:hidden"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 60px)' }}
+      >
+        <span className="creator-signature pointer-events-auto">by ozero</span>
+      </div>
+
       {/* Mobile bottom navigation */}
       <nav
         className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around px-1 py-2 sm:hidden"
@@ -216,6 +234,7 @@ export default function App() {
       >
         {TABS.map((tab) => {
           const isActive = tab.id === activeTab;
+          const Icon = tab.icon;
           return (
             <button
               key={tab.id}
@@ -224,7 +243,10 @@ export default function App() {
               aria-current={isActive ? 'page' : undefined}
               className="flex flex-col items-center gap-0.5 px-1 py-1 focus:outline-none"
             >
-              <span className="text-base leading-none">{tab.icon}</span>
+              <Icon
+                size={20}
+                className={isActive ? 'text-[#F7931A]' : 'text-[#8892A4]'}
+              />
               <span
                 className={
                   'text-[10px] leading-tight transition-colors ' +
@@ -298,6 +320,11 @@ export default function App() {
           />
         ) : null}
       </main>
+
+      {/* Desktop creator signature footer */}
+      <footer className="hidden sm:flex justify-center pb-6">
+        <span className="creator-signature">by ozero</span>
+      </footer>
     </div>
   );
 }

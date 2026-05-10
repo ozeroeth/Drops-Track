@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import CardActionMenu from './CardActionMenu.jsx';
+import { Globe, TwitterX } from './icons.jsx';
 import { isExpiringSoon, isPast, daysUntil } from '../utils/date.js';
 import { resolveNetworkLabel } from '../utils/networks.js';
 
@@ -68,7 +69,7 @@ export default function AirdropCard({
 
   return (
     <article
-      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-5 transition-all duration-200"
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
       style={{
         background: 'rgba(13,17,23,0.85)',
         border: soon
@@ -89,7 +90,7 @@ export default function AirdropCard({
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      <header className="flex items-start justify-between gap-3">
+      <header className="relative flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           {airdrop.logoUrl && !imgFailed ? (
             <img
@@ -104,7 +105,7 @@ export default function AirdropCard({
             </div>
           )}
           <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold text-white">
+            <h3 className="text-base font-bold text-white max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none">
               {airdrop.name}
             </h3>
             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -126,7 +127,7 @@ export default function AirdropCard({
             </div>
           </div>
         </div>
-        <div className="flex-none">
+        <div className="absolute top-0 right-0 flex-none md:static">
           <CardActionMenu
             onEdit={() => onEdit(airdrop)}
             onDuplicate={() => onDuplicate && onDuplicate(airdrop)}
@@ -153,7 +154,7 @@ export default function AirdropCard({
         </div>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex items-center justify-between gap-3 md:grid md:grid-cols-2">
         <DeadlineLabel iso={airdrop.deadline} label="Deadline" />
         <div className="flex flex-col gap-0.5 text-xs">
           <span className="uppercase tracking-wide text-textSecondary">
@@ -182,15 +183,7 @@ export default function AirdropCard({
       </div>
 
       {airdrop.notes ? (
-        <p
-          className="text-xs text-textSecondary"
-          style={{
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
+        <p className="text-xs text-textSecondary line-clamp-2 md:line-clamp-3">
           {airdrop.notes}
         </p>
       ) : null}
@@ -222,25 +215,29 @@ export default function AirdropCard({
       ) : null}
 
       {(airdrop.link || airdrop.twitterUrl) ? (
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-3">
           {airdrop.link ? (
             <a
               href={airdrop.link}
               target="_blank"
-              rel="noreferrer"
-              className="text-xs font-medium text-primary hover:text-primary/80 focus:outline-none"
+              rel="noreferrer noopener"
+              aria-label="Open official site"
+              className="icon-link text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
             >
-              Open official site
+              <Globe size={16} />
+              <span className="hidden md:inline">Open official site</span>
             </a>
           ) : null}
           {airdrop.twitterUrl ? (
             <a
               href={airdrop.twitterUrl}
               target="_blank"
-              rel="noreferrer"
-              className="text-xs font-medium text-textSecondary hover:text-white focus:outline-none"
+              rel="noreferrer noopener"
+              aria-label="Twitter / X"
+              className="icon-link text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
             >
-              <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>{'\u{1D54F}'}</span> Twitter/X
+              <TwitterX size={16} />
+              <span className="hidden md:inline">Twitter / X</span>
             </a>
           ) : null}
         </div>

@@ -15,6 +15,30 @@ html {
   }
 }
 
+@layer components {
+  .icon-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #8892A4;
+    transition: color 0.15s ease;
+  }
+  .icon-link:hover {
+    color: #FFFFFF;
+  }
+
+  .creator-signature {
+    font-style: italic;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.2);
+    transition: color 0.2s ease;
+    user-select: none;
+  }
+  .creator-signature:hover {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
