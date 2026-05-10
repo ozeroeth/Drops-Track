@@ -107,6 +107,16 @@ export function Database({ size = 20, className, ...rest }) {
   );
 }
 
+export function MoreHorizontal({ size = 20, className, ...rest }) {
+  return (
+    <svg {...strokeProps(size, className, rest)}>
+      <circle cx="5" cy="12" r="1" />
+      <circle cx="12" cy="12" r="1" />
+      <circle cx="19" cy="12" r="1" />
+    </svg>
+  );
+}
+
 export function Globe({ size = 20, className, ...rest }) {
   return (
     <svg {...strokeProps(size, className, rest)}>

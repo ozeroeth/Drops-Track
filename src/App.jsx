@@ -31,7 +31,9 @@ import {
   Wallet,
   Settings as SettingsIcon,
   Database,
+  MoreHorizontal,
 } from './components/icons.jsx';
+import MobileMoreMenu from './components/MobileMoreMenu.jsx';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -44,10 +46,14 @@ const TABS = [
   { id: 'data', label: 'Data', icon: Database },
 ];
 
+const MAIN_MOBILE_TAB_IDS = ['dashboard', 'airdrops', 'whitelists', 'wallets'];
+const MORE_MOBILE_TAB_IDS = ['calendar', 'stats', 'settings', 'data'];
+
 export default function App() {
   const { session, user, loading, signOut } = useAuth();
 
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const enabled = !!user;
   const userId = user?.id || null;
@@ -232,7 +238,7 @@ export default function App() {
         }}
         aria-label="Primary"
       >
-        {TABS.map((tab) => {
+        {MAIN_MOBILE_TAB_IDS.map((id) => TABS.find((t) => t.id === id)).map((tab) => {
           const isActive = tab.id === activeTab;
           const Icon = tab.icon;
           return (
@@ -261,7 +267,45 @@ export default function App() {
             </button>
           );
         })}
+        {(() => {
+          const isActive = MORE_MOBILE_TAB_IDS.includes(activeTab) || moreOpen;
+          return (
+            <button
+              key="more"
+              type="button"
+              onClick={() => setMoreOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={moreOpen}
+              aria-current={MORE_MOBILE_TAB_IDS.includes(activeTab) ? 'page' : undefined}
+              className="flex flex-col items-center gap-0.5 px-1 py-1 focus:outline-none"
+            >
+              <MoreHorizontal
+                size={20}
+                className={isActive ? 'text-[#F7931A]' : 'text-[#8892A4]'}
+              />
+              <span
+                className={
+                  'text-[10px] leading-tight transition-colors ' +
+                  (isActive ? 'text-primary' : 'text-textSecondary')
+                }
+              >
+                More
+              </span>
+              {isActive ? (
+                <span className="mt-0.5 h-1 w-1 rounded-full" style={{ background: '#F7931A' }} />
+              ) : null}
+            </button>
+          );
+        })()}
       </nav>
+
+      <MobileMoreMenu
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        activeTab={activeTab}
+        onSelect={(id) => setActiveTab(id)}
+        tabs={MORE_MOBILE_TAB_IDS.map((id) => TABS.find((t) => t.id === id))}
+      />
 
       <main
         key={activeTab}
