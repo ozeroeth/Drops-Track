@@ -222,7 +222,7 @@ export default function AirdropCard({
               target="_blank"
               rel="noreferrer noopener"
               aria-label="Open official site"
-              className="icon-link text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
+              className="icon-link text-xs font-medium text-primary hover:text-primary/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
             >
               <Globe size={16} />
               <span className="hidden md:inline">Open official site</span>
@@ -234,7 +234,7 @@ export default function AirdropCard({
               target="_blank"
               rel="noreferrer noopener"
               aria-label="Twitter / X"
-              className="icon-link text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
+              className="icon-link text-xs font-medium text-textSecondary hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
             >
               <TwitterX size={16} />
               <span className="hidden md:inline">Twitter / X</span>

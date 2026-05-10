@@ -20,11 +20,6 @@ html {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #8892A4;
-    transition: color 0.15s ease;
-  }
-  .icon-link:hover {
-    color: #FFFFFF;
   }
 
   .creator-signature {
