@@ -154,7 +154,7 @@ export default function AirdropCard({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between gap-3 md:grid md:grid-cols-2">
+      <div className="flex items-start justify-between gap-3 md:grid md:grid-cols-2 md:items-stretch">
         <DeadlineLabel iso={airdrop.deadline} label="Deadline" />
         <div className="flex flex-col gap-0.5 text-xs">
           <span className="uppercase tracking-wide text-textSecondary">
