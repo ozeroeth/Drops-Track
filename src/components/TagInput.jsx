@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SUGGESTED_TAGS } from '../constants/index.js';
+import TagChip from './TagChip.jsx';
 
 const MAX_TAG_LENGTH = 32;
 
@@ -60,22 +61,14 @@ export default function TagInput({
       {tags.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
           {tags.map((tag, i) => (
-            <span
-              key={`${tag}-${i}`}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
-              style={{
-                backgroundColor: 'rgba(247,147,26,0.1)',
-                border: '1px solid rgba(247,147,26,0.2)',
-                color: '#F7931A',
-              }}
-            >
-              <span>{tag}</span>
+            <span key={`${tag}-${i}`} className="inline-flex items-center gap-1">
+              <TagChip>{tag}</TagChip>
               <button
                 type="button"
                 onClick={() => removeAt(i)}
                 aria-label={`Remove ${tag}`}
-                className="rounded-full px-1 transition-colors hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/40"
-                style={{ color: '#F7931A' }}
+                className="rounded-full px-1 text-[11px] leading-none transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+                style={{ color: '#A78BFA' }}
               >
                 <span aria-hidden="true">&times;</span>
               </button>

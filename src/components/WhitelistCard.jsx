@@ -2,6 +2,7 @@ import React from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import CardActionMenu from './CardActionMenu.jsx';
+import TagChip from './TagChip.jsx';
 import { Globe, TwitterX } from './icons.jsx';
 import { isExpiringSoon, isPast, daysUntil, primaryWhitelistDeadline } from '../utils/date.js';
 
@@ -73,17 +74,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
       {Array.isArray(whitelist.tags) && whitelist.tags.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
           {whitelist.tags.map((tag, i) => (
-            <span
-              key={`${tag}-${i}`}
-              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
-              style={{
-                backgroundColor: 'rgba(247,147,26,0.1)',
-                border: '1px solid rgba(247,147,26,0.2)',
-                color: 'rgba(247,147,26,0.8)',
-              }}
-            >
-              {tag}
-            </span>
+            <TagChip key={`${tag}-${i}`}>{tag}</TagChip>
           ))}
         </div>
       ) : null}
