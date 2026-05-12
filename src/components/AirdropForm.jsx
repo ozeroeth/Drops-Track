@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
-import NetworkSelect from './NetworkSelect.jsx';
-import TagInput from './TagInput.jsx';
 import { NETWORKS, AIRDROP_STATUSES } from '../constants/index.js';
 import { generateId } from '../utils/id.js';
-import { todayIsoLocal } from '../utils/date.js';
 
 function emptyEntry() {
   return {
@@ -17,10 +14,8 @@ function emptyEntry() {
     estimatedValueUsd: '',
     walletId: '',
     tasks: [],
-    tags: [],
     notes: '',
     link: '',
-    twitterUrl: '',
     createdAt: '',
   };
 }
@@ -46,23 +41,11 @@ function fromInitial(initial) {
           done: !!t.done,
         }))
       : [],
-    tags: Array.isArray(initial.tags)
-      ? initial.tags.filter((t) => typeof t === 'string' && t.trim() !== '')
-      : [],
     notes: initial.notes || '',
     link: initial.link || '',
-    twitterUrl: initial.twitterUrl || '',
     createdAt: initial.createdAt || '',
   };
 }
-
-const inputClass =
-  'mt-1 w-full rounded-[10px] border px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
-
-const inputStyle = {
-  background: 'rgba(255,255,255,0.04)',
-  borderColor: 'rgba(255,255,255,0.08)',
-};
 
 export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
   const [form, setForm] = useState(() => fromInitial(initial));
@@ -121,7 +104,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
       const n = Number(estRaw);
       estimatedValueUsd = Number.isFinite(n) ? n : null;
     }
-    const now = todayIsoLocal();
+    const now = new Date().toISOString().slice(0, 10);
     const entry = {
       id: form.id || generateId(),
       name,
@@ -136,10 +119,8 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         label: t.label,
         done: !!t.done,
       })),
-      tags: Array.isArray(form.tags) ? form.tags.slice() : [],
       notes: form.notes,
       link: form.link.trim(),
-      twitterUrl: form.twitterUrl.trim(),
       createdAt: form.createdAt || now,
     };
     onSubmit(entry);
@@ -151,24 +132,23 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
     <Modal open onClose={onCancel} title={isEdit ? 'Edit airdrop' : 'Add airdrop'}>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-name">
-            Name <span className="text-danger">*</span>
+          <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-name">
+            Name <span style={{ color: '#c62828' }}>*</span>
           </label>
           <input
             id="af-name"
             type="text"
             value={form.name}
             onChange={(e) => update('name', e.target.value)}
-            className={inputClass}
-            style={inputStyle}
+            className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
             autoFocus
           />
-          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
+          {error ? <p className="mt-1 text-xs" style={{ color: '#c62828' }}>{error}</p> : null}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-logo">
+            <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-logo">
               Logo URL
             </label>
             <input
@@ -176,33 +156,38 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               type="url"
               value={form.logoUrl}
               onChange={(e) => update('logoUrl', e.target.value)}
-              className={inputClass}
-              style={inputStyle}
+              className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-network">
+            <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-network">
               Network
             </label>
-            <NetworkSelect
+            <select
               id="af-network"
               value={form.network}
-              onChange={(v) => update('network', v)}
-            />
+              onChange={(e) => update('network', e.target.value)}
+              className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
+            >
+              {NETWORKS.map((n) => (
+                <option key={n.id} value={n.id}>
+                  {n.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
-            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-status">
+            <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-status">
               Status
             </label>
             <select
               id="af-status"
               value={form.status}
               onChange={(e) => update('status', e.target.value)}
-              className={inputClass}
-              style={inputStyle}
+              className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
             >
               {AIRDROP_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -212,7 +197,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-deadline">
+            <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-deadline">
               Deadline
             </label>
             <input
@@ -220,12 +205,11 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               type="date"
               value={form.deadline}
               onChange={(e) => update('deadline', e.target.value)}
-              className={inputClass}
-              style={inputStyle}
+              className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-textSecondary" htmlFor="af-value">
+            <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-value">
               Est. value (USD)
             </label>
             <input
@@ -235,22 +219,20 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               min="0"
               value={form.estimatedValueUsd}
               onChange={(e) => update('estimatedValueUsd', e.target.value)}
-              className={inputClass}
-              style={inputStyle}
+              className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-wallet">
+          <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-wallet">
             Wallet
           </label>
           <select
             id="af-wallet"
             value={form.walletId}
             onChange={(e) => update('walletId', e.target.value)}
-            className={inputClass}
-            style={inputStyle}
+            className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
           >
             <option value="">{'\u2014 None \u2014'}</option>
             {wallets.map((w) => (
@@ -262,23 +244,10 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-tags">
-            Tags
-          </label>
-          <div className="mt-1">
-            <TagInput
-              id="af-tags"
-              value={form.tags}
-              onChange={(tags) => update('tags', tags)}
-            />
-          </div>
-        </div>
-
-        <div>
-          <div className="block text-xs font-medium text-textSecondary">Tasks</div>
+          <div className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Tasks</div>
           <div className="mt-1 space-y-1.5">
             {form.tasks.length === 0 ? (
-              <p className="text-xs text-textSecondary">No tasks yet.</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No tasks yet.</p>
             ) : (
               form.tasks.map((t) => (
                 <div key={t.id} className="flex items-center gap-2">
@@ -286,7 +255,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
                     type="checkbox"
                     checked={!!t.done}
                     onChange={() => toggleTaskDone(t.id)}
-                    className="h-4 w-4 flex-none rounded border-surfaceBorder bg-surface text-primary focus:ring-2 focus:ring-primary/20"
+                    className="h-4 w-4 flex-none rounded"
                   />
                   <input
                     type="text"
@@ -299,14 +268,13 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
                         ),
                       }))
                     }
-                    className="flex-1 rounded-[10px] border px-2 py-1 text-sm text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    style={inputStyle}
+                    className="sketchy-input flex-1 px-2 py-1 text-sm"
                   />
                   <button
                     type="button"
                     onClick={() => removeTask(t.id)}
-                    className="rounded-[10px] border px-2 py-1 text-xs text-textSecondary hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
+                    className="sketchy-btn"
+                    style={{ padding: '4px 8px', fontSize: '12px', background: 'var(--surface)', color: 'var(--text)' }}
                   >
                     Remove
                   </button>
@@ -325,13 +293,13 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
                     addTask();
                   }
                 }}
-                className="flex-1 rounded-[10px] border px-2 py-1 text-sm text-white placeholder-[#4A5568] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                style={inputStyle}
+                className="sketchy-input flex-1 px-2 py-1 text-sm"
               />
               <button
                 type="button"
                 onClick={addTask}
-                className="rounded-[10px] border border-primary/40 bg-primary/20 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="sketchy-btn"
+                style={{ padding: '4px 8px', fontSize: '12px' }}
               >
                 Add
               </button>
@@ -340,7 +308,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-notes">
+          <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-notes">
             Notes
           </label>
           <textarea
@@ -348,13 +316,12 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             rows={3}
             value={form.notes}
             onChange={(e) => update('notes', e.target.value)}
-            className={inputClass}
-            style={inputStyle}
+            className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-link">
+          <label className="block text-xs font-medium" style={{ color: 'var(--text-muted)' }} htmlFor="af-link">
             Link
           </label>
           <input
@@ -362,25 +329,7 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
             type="url"
             value={form.link}
             onChange={(e) => update('link', e.target.value)}
-            className={inputClass}
-            style={inputStyle}
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-textSecondary" htmlFor="af-twitter">
-            <span className="inline-flex items-center gap-1.5">
-              <span style={{fontFamily: 'serif', fontWeight: 'bold'}}>&#x1D54F;</span> Twitter/X
-            </span>
-          </label>
-          <input
-            id="af-twitter"
-            type="url"
-            value={form.twitterUrl}
-            onChange={(e) => update('twitterUrl', e.target.value)}
-            placeholder="https://x.com/..."
-            className={inputClass}
-            style={inputStyle}
+            className="sketchy-input mt-1 w-full px-3 py-2 text-sm"
           />
         </div>
 
@@ -388,15 +337,14 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border px-3 py-1.5 text-sm text-textSecondary transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
-            style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'transparent' }}
+            className="sketchy-btn"
+            style={{ background: 'var(--surface)', color: 'var(--text)' }}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-[0_4px_20px_rgba(247,147,26,0.3)] focus:outline-none focus:ring-2 focus:ring-primary/20"
-            style={{ background: 'linear-gradient(135deg, #F7931A, #E8820A)' }}
+            className="sketchy-btn"
           >
             {isEdit ? 'Save changes' : 'Add airdrop'}
           </button>

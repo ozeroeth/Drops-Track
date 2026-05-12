@@ -1,34 +1,28 @@
 import React from 'react';
 
 const STATUS_STYLES = {
-  Active: { bg: 'rgba(0,200,150,0.1)', border: 'rgba(0,200,150,0.3)', color: '#00C896' },
-  Whitelisted: { bg: 'rgba(0,200,150,0.1)', border: 'rgba(0,200,150,0.3)', color: '#00C896' },
-  Minted: { bg: 'rgba(0,200,150,0.1)', border: 'rgba(0,200,150,0.3)', color: '#00C896' },
-  Pending: { bg: 'rgba(255,184,0,0.1)', border: 'rgba(255,184,0,0.3)', color: '#FFB800' },
-  Applied: { bg: 'rgba(255,184,0,0.1)', border: 'rgba(255,184,0,0.3)', color: '#FFB800' },
-  Missed: { bg: 'rgba(255,71,87,0.1)', border: 'rgba(255,71,87,0.3)', color: '#FF4757' },
-  'Not Selected': { bg: 'rgba(255,71,87,0.1)', border: 'rgba(255,71,87,0.3)', color: '#FF4757' },
-  Claimed: { bg: 'rgba(0,209,255,0.1)', border: 'rgba(0,209,255,0.3)', color: '#00D1FF' },
+  Active: 'border-[#2e7d32] text-[#2e7d32] bg-[rgba(46,125,50,0.1)]',
+  Whitelisted: 'border-[#2e7d32] text-[#2e7d32] bg-[rgba(46,125,50,0.1)]',
+  Minted: 'border-[#1565c0] text-[#1565c0] bg-[rgba(21,101,192,0.1)]',
+  Pending: 'border-[#f57c00] text-[#f57c00] bg-[rgba(245,124,0,0.1)]',
+  Applied: 'border-[#f57c00] text-[#f57c00] bg-[rgba(245,124,0,0.1)]',
+  Missed: 'border-[#c62828] text-[#c62828] bg-[rgba(198,40,40,0.1)]',
+  'Not Selected': 'border-[#c62828] text-[#c62828] bg-[rgba(198,40,40,0.1)]',
+  Claimed: 'border-[#1565c0] text-[#1565c0] bg-[rgba(21,101,192,0.1)]',
 };
 
-const FALLBACK_STYLE = { bg: 'rgba(136,146,164,0.1)', border: 'rgba(136,146,164,0.3)', color: '#8892A4' };
+const FALLBACK_STYLE = 'border-[var(--text-muted)] text-[var(--text-muted)] bg-transparent';
 
 export default function StatusBadge({ status }) {
   const label = status || 'Unknown';
   const style = STATUS_STYLES[status] || FALLBACK_STYLE;
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium"
-      style={{
-        background: style.bg,
-        border: `1px solid ${style.border}`,
-        color: style.color,
-      }}
+      className={
+        'inline-flex items-center rounded-full border-2 px-2 py-0.5 font-sketch text-sm font-semibold ' +
+        style
+      }
     >
-      <span
-        className="inline-block h-1.5 w-1.5 rounded-full"
-        style={{ background: style.color }}
-      />
       {label}
     </span>
   );

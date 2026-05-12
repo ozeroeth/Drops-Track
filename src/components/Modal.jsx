@@ -17,8 +17,7 @@ export default function Modal({ open, onClose, title, children, widthClass = 'ma
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-8 sm:items-center"
-      style={{ background: 'rgba(0,0,0,0.8)' }}
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 px-4 py-8 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label={title || 'Dialog'}
@@ -32,34 +31,26 @@ export default function Modal({ open, onClose, title, children, widthClass = 'ma
         className={
           'w-full ' +
           widthClass +
-          ' rounded-2xl shadow-2xl'
+          ' sketchy-card'
         }
-        style={{
-          background: 'rgba(13,17,23,0.95)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-        }}
       >
         {title ? (
-          <div
-            className="flex items-center justify-between gap-3 px-6 py-4"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            <h2 className="text-base font-semibold text-white">{title}</h2>
+          <div className="flex items-center justify-between gap-3 px-5 py-3" style={{ borderBottom: '2.5px solid var(--border)' }}>
+            <h2 className="font-sketch text-lg font-semibold" style={{ color: 'var(--text)' }}>{title}</h2>
             <button
               type="button"
               onClick={() => {
                 if (typeof onClose === 'function') onClose();
               }}
               aria-label="Close dialog"
-              className="flex h-7 w-7 flex-none items-center justify-center rounded-lg text-textSecondary transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="flex h-7 w-7 flex-none items-center justify-center rounded-md"
+              style={{ color: 'var(--text-muted)' }}
             >
               <span aria-hidden="true" className="text-lg leading-none">&times;</span>
             </button>
           </div>
         ) : null}
-        <div className="px-6 py-5">{children}</div>
+        <div className="px-5 py-4">{children}</div>
       </div>
     </div>
   );

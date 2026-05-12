@@ -1,9 +1,14 @@
 import React, { useRef, useState } from 'react';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import { exportToCSV, downloadCSV, parseCSV } from '../utils/csv.js';
+import { writeJSON, removeKey } from '../utils/storage.js';
+import { STORAGE_KEYS } from '../constants/index.js';
+import {
+  sampleAirdrops,
+  sampleWhitelists,
+  sampleWallets,
+} from '../data/sampleData.js';
 import { generateId } from '../utils/id.js';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { forceSeedSampleData } from '../data/seeding.js';
 
 const AIRDROP_HEADERS = [
   'id',
@@ -18,8 +23,6 @@ const AIRDROP_HEADERS = [
   'notes',
   'link',
   'createdAt',
-  'tags',
-  'twitterUrl',
 ];
 
 const WHITELIST_HEADERS = [
@@ -34,8 +37,6 @@ const WHITELIST_HEADERS = [
   'notes',
   'link',
   'createdAt',
-  'tags',
-  'twitterUrl',
 ];
 
 const WALLET_HEADERS = ['id', 'label', 'address', 'chainType'];
@@ -65,8 +66,6 @@ function serializeAirdrop(a) {
     notes: a.notes || '',
     link: a.link || '',
     createdAt: a.createdAt || '',
-    tags: JSON.stringify(Array.isArray(a.tags) ? a.tags : []),
-    twitterUrl: a.twitterUrl || '',
   };
 }
 
@@ -83,8 +82,6 @@ function serializeWhitelist(w) {
     notes: w.notes || '',
     link: w.link || '',
     createdAt: w.createdAt || '',
-    tags: JSON.stringify(Array.isArray(w.tags) ? w.tags : []),
-    twitterUrl: w.twitterUrl || '',
   };
 }
 
@@ -95,20 +92,6 @@ function serializeWallet(w) {
     address: w.address || '',
     chainType: w.chainType || '',
   };
-}
-
-function parseTagsField(raw) {
-  if (raw === undefined || raw === null || raw === '') return [];
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((t) => typeof t === 'string')
-      .map((t) => t.trim())
-      .filter((t) => t !== '');
-  } catch (err) {
-    return [];
-  }
 }
 
 function normalizeAirdropRow(row) {
@@ -142,10 +125,8 @@ function normalizeAirdropRow(row) {
     estimatedValueUsd,
     walletId: row.walletId || '',
     tasks,
-    tags: parseTagsField(row.tags),
     notes: row.notes || '',
     link: row.link || '',
-    twitterUrl: row.twitterUrl || '',
     createdAt: row.createdAt || '',
   };
 }
@@ -160,10 +141,8 @@ function normalizeWhitelistRow(row) {
     mintDate: row.mintDate || '',
     walletId: row.walletId || '',
     mintPrice: row.mintPrice || '',
-    tags: parseTagsField(row.tags),
     notes: row.notes || '',
     link: row.link || '',
-    twitterUrl: row.twitterUrl || '',
     createdAt: row.createdAt || '',
   };
 }
@@ -189,20 +168,13 @@ function readFileAsText(file) {
 function Row({ title, description, onExport, onImport, exporting, importMessage }) {
   const inputRef = useRef(null);
   return (
-    <div
-      className="rounded-2xl p-5"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(12px)',
-      }}
-    >
+    <div className="sketchy-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-white">{title}</h3>
-          <p className="mt-1 text-xs text-textSecondary">{description}</p>
+          <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>{title}</h3>
+          <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{description}</p>
           {importMessage ? (
-            <p className="mt-2 text-xs text-white/80">{importMessage}</p>
+            <p className="mt-2 text-xs" style={{ color: 'var(--text)' }}>{importMessage}</p>
           ) : null}
         </div>
         <div className="flex flex-none flex-wrap gap-2">
@@ -210,7 +182,8 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
             type="button"
             onClick={onExport}
             disabled={exporting}
-            className="rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+            className="sketchy-btn"
+            style={{ background: 'var(--surface)', color: 'var(--text)' }}
           >
             Export CSV
           </button>
@@ -228,11 +201,7 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
           <button
             type="button"
             onClick={() => inputRef.current && inputRef.current.click()}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/40"
-            style={{
-              backgroundColor: 'rgba(247,147,26,0.15)',
-              border: '1px solid rgba(247,147,26,0.3)',
-            }}
+            className="sketchy-btn"
           >
             Import CSV
           </button>
@@ -249,12 +218,9 @@ export default function DataManager({
   setWhitelists,
   wallets,
   setWallets,
-  onForceReseed,
 }) {
-  const { user } = useAuth();
-  const [pendingImport, setPendingImport] = useState(null);
+  const [pendingImport, setPendingImport] = useState(null); // { kind, rows, fileName }
   const [pendingReset, setPendingReset] = useState(false);
-  const [resetting, setResetting] = useState(false);
   const [lastMessage, setLastMessage] = useState({
     airdrops: '',
     whitelists: '',
@@ -307,34 +273,21 @@ export default function DataManager({
     setPendingImport(null);
   }
 
-  async function performReset() {
-    if (resetting) return;
-    setResetting(true);
-    setAirdrops([]);
-    setWhitelists([]);
-    setWallets([]);
-    try {
-      if (user?.id) {
-        await forceSeedSampleData(user.id);
-      }
-      if (typeof onForceReseed === 'function') {
-        await onForceReseed();
-      }
-      setLastMessage({
-        airdrops: 'All data cleared and sample data reseeded.',
-        whitelists: '',
-        wallets: '',
-      });
-    } catch (err) {
-      setLastMessage({
-        airdrops: `Reset failed: ${err && err.message ? err.message : 'unknown error'}`,
-        whitelists: '',
-        wallets: '',
-      });
-    } finally {
-      setPendingReset(false);
-      setResetting(false);
-    }
+  function performReset() {
+    removeKey(STORAGE_KEYS.airdrops);
+    removeKey(STORAGE_KEYS.whitelists);
+    removeKey(STORAGE_KEYS.wallets);
+    removeKey(STORAGE_KEYS.seeded);
+    setAirdrops(sampleAirdrops);
+    setWhitelists(sampleWhitelists);
+    setWallets(sampleWallets);
+    writeJSON(STORAGE_KEYS.seeded, '1');
+    setPendingReset(false);
+    setLastMessage({
+      airdrops: 'All data cleared and sample data reseeded.',
+      whitelists: '',
+      wallets: '',
+    });
   }
 
   const pendingCount = pendingImport ? pendingImport.rows.length : 0;
@@ -364,25 +317,19 @@ export default function DataManager({
         importMessage={lastMessage.wallets}
       />
 
-      <div
-        className="rounded-2xl p-5"
-        style={{
-          border: '1px solid rgba(255,71,87,0.3)',
-          backgroundColor: 'rgba(255,71,87,0.05)',
-        }}
-      >
-        <h3 className="text-sm font-semibold text-danger">Danger zone</h3>
-        <p className="mt-1 text-xs text-danger/80">
-          Clear all of your DropTrack data in Supabase and reseed the sample
-          data. This only affects your account and cannot be undone.
+      <div className="sketchy-card p-4" style={{ borderColor: '#c62828' }}>
+        <h3 className="font-sketch text-base font-semibold" style={{ color: '#c62828' }}>Danger zone</h3>
+        <p className="mt-1 text-xs" style={{ color: 'rgba(198,40,40,0.8)' }}>
+          Clear all locally stored DropTrack data and reseed the sample data.
+          This cannot be undone.
         </p>
         <button
           type="button"
           onClick={() => setPendingReset(true)}
-          disabled={resetting}
-          className="mt-3 rounded-lg border border-danger/40 bg-danger/80 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-danger focus:outline-none focus:ring-2 focus:ring-danger/60 disabled:opacity-50"
+          className="sketchy-btn mt-3"
+          style={{ background: '#c62828', color: 'white', borderColor: '#c62828' }}
         >
-          {resetting ? 'Clearing...' : 'Clear all data'}
+          Clear all data
         </button>
       </div>
 
@@ -402,7 +349,7 @@ export default function DataManager({
       <ConfirmDialog
         open={pendingReset}
         title="Clear all data?"
-        body="This will wipe all of your airdrops, whitelists, and wallets in Supabase and reseed the sample data. Your Telegram notification settings are preserved. Other users are unaffected."
+        body="This will wipe all airdrops, whitelists, and wallets from localStorage and reseed the sample data."
         confirmLabel="Clear and reseed"
         onConfirm={performReset}
         onCancel={() => setPendingReset(false)}

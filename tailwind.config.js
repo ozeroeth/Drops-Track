@@ -51,6 +51,10 @@ export default {
         shimmer: 'shimmer 2s ease-in-out infinite',
         'orb-pulse': 'orbPulse 4s ease-in-out infinite',
       },
+      fontFamily: {
+        sketch: ['Caveat', 'cursive'],
+        body: ['Nunito', 'sans-serif'],
+      },
     },
   },
   plugins: [],

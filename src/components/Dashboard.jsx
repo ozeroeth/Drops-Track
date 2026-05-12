@@ -3,7 +3,7 @@ import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import EmptyState from './EmptyState.jsx';
 import { daysUntil, isExpiringSoon, primaryWhitelistDeadline } from '../utils/date.js';
-import { resolveNetworkLabel } from '../utils/networks.js';
+import { NETWORKS } from '../constants/index.js';
 
 function formatUsd(value) {
   if (typeof value !== 'number' || Number.isNaN(value)) return '\u2014';
@@ -18,50 +18,36 @@ function formatUsd(value) {
   }
 }
 
-const CARD_ACCENTS = [
-  { emoji: '\u{1FA82}', color: '#F7931A' },
-  { emoji: '\u{1F3AF}', color: '#9945FF' },
-  { emoji: '\u{1F4B0}', color: '#00D1FF' },
-  { emoji: '\u23F0', color: '#FF4757' },
-];
+function networkLabel(id) {
+  const match = NETWORKS.find((n) => n.id === id);
+  return match ? match.label : id || '';
+}
 
-function SummaryCard({ title, value, hint, onClick, accentIndex }) {
-  const accent = CARD_ACCENTS[accentIndex] || CARD_ACCENTS[0];
+function SummaryCard({ title, value, hint, onClick }) {
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className="relative rounded-2xl p-5 text-left transition-all duration-200 hover:-translate-y-0.5"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(12px)',
-        borderLeft: `3px solid ${accent.color}`,
-      }}
+      className="sketchy-card p-4 text-left"
     >
-      <p className="text-xs uppercase tracking-wide text-textSecondary">
-        <span className="mr-1.5">{accent.emoji}</span>
-        {title}
-      </p>
-      <p className="mt-1 font-heading text-3xl font-bold text-white">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-textSecondary">{hint}</p> : null}
+      <p className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>{title}</p>
+      <p className="mt-1 font-sketch text-2xl font-bold" style={{ color: 'var(--text)' }}>{value}</p>
+      {hint ? <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p> : null}
     </Tag>
   );
 }
 
 function UpcomingItem({ title, subtitle, iso, label, highlight }) {
+  const borderStyle = highlight ? { borderColor: '#f57c00' } : {};
   return (
     <li
-      className={
-        'flex items-center justify-between gap-3 rounded-xl border px-3 py-2 ' +
-        (highlight ? 'border-primary/40' : 'border-surfaceBorder')
-      }
-      style={{ background: 'rgba(13,17,23,0.6)' }}
+      className="sketchy-card flex items-center justify-between gap-3 px-3 py-2"
+      style={{ ...borderStyle, boxShadow: '2px 2px 0 var(--shadow)', borderWidth: '2px' }}
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-white">{title}</p>
-        <div className="mt-0.5 text-xs text-textSecondary">{subtitle}</div>
+        <p className="truncate text-sm font-medium" style={{ color: 'var(--text)' }}>{title}</p>
+        <div className="mt-0.5 text-xs" style={{ color: 'var(--text-muted)' }}>{subtitle}</div>
       </div>
       <DeadlineLabel iso={iso} label={label} />
     </li>
@@ -146,46 +132,36 @@ export default function Dashboard({
           value={stats.activeAirdrops}
           hint="Click to open Airdrops tab"
           onClick={onJumpToAirdrops}
-          accentIndex={0}
         />
         <SummaryCard
           title="Whitelisted"
           value={stats.whitelisted}
           hint="Whitelisted or Minted"
           onClick={onJumpToWhitelists}
-          accentIndex={1}
         />
         <SummaryCard
           title="Estimated Total Value"
           value={formatUsd(stats.totalValue)}
           hint="Active airdrops only"
-          accentIndex={2}
         />
         <SummaryCard
           title="Deadlines This Week"
           value={stats.deadlinesThisWeek}
           hint="Airdrops + whitelists, next 7 days"
-          accentIndex={3}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section
-          className="rounded-2xl p-5"
-          style={{
-            background: 'rgba(13,17,23,0.85)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(12px)',
-          }}
-        >
+        <section className="sketchy-card p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>
               Upcoming Airdrop Deadlines
             </h3>
             <button
               type="button"
               onClick={onJumpToAirdrops}
-              className="text-xs text-primary hover:underline focus:outline-none"
+              className="text-xs font-sketch font-semibold"
+              style={{ color: 'var(--accent)' }}
             >
               View all
             </button>
@@ -203,7 +179,7 @@ export default function Dashboard({
                   title={a.name}
                   subtitle={
                     <span className="flex items-center gap-2">
-                      <span>{resolveNetworkLabel(a.network)}</span>
+                      <span>{networkLabel(a.network)}</span>
                       <StatusBadge status={a.status} />
                     </span>
                   }
@@ -216,22 +192,16 @@ export default function Dashboard({
           )}
         </section>
 
-        <section
-          className="rounded-2xl p-5"
-          style={{
-            background: 'rgba(13,17,23,0.85)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(12px)',
-          }}
-        >
+        <section className="sketchy-card p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>
               Upcoming Whitelist Mints
             </h3>
             <button
               type="button"
               onClick={onJumpToWhitelists}
-              className="text-xs text-primary hover:underline focus:outline-none"
+              className="text-xs font-sketch font-semibold"
+              style={{ color: 'var(--accent)' }}
             >
               View all
             </button>
