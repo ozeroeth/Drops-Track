@@ -168,13 +168,13 @@ function readFileAsText(file) {
 function Row({ title, description, onExport, onImport, exporting, importMessage }) {
   const inputRef = useRef(null);
   return (
-    <div className="rounded-lg border border-surface2 bg-surface p-4">
+    <div className="sketchy-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-slate-100">{title}</h3>
-          <p className="mt-1 text-xs text-slate-400">{description}</p>
+          <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>{title}</h3>
+          <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{description}</p>
           {importMessage ? (
-            <p className="mt-2 text-xs text-slate-300">{importMessage}</p>
+            <p className="mt-2 text-xs" style={{ color: 'var(--text)' }}>{importMessage}</p>
           ) : null}
         </div>
         <div className="flex flex-none flex-wrap gap-2">
@@ -182,7 +182,8 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
             type="button"
             onClick={onExport}
             disabled={exporting}
-            className="rounded-md border border-surface2 bg-surface2 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40 disabled:opacity-50"
+            className="sketchy-btn"
+            style={{ background: 'var(--surface)', color: 'var(--text)' }}
           >
             Export CSV
           </button>
@@ -200,7 +201,7 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
           <button
             type="button"
             onClick={() => inputRef.current && inputRef.current.click()}
-            className="rounded-md border border-accent-500/40 bg-accent-500/20 px-3 py-1.5 text-sm font-medium text-accent-200 hover:bg-accent-500/30 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="sketchy-btn"
           >
             Import CSV
           </button>
@@ -316,16 +317,17 @@ export default function DataManager({
         importMessage={lastMessage.wallets}
       />
 
-      <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4">
-        <h3 className="text-sm font-semibold text-red-300">Danger zone</h3>
-        <p className="mt-1 text-xs text-red-200/80">
+      <div className="sketchy-card p-4" style={{ borderColor: '#c62828' }}>
+        <h3 className="font-sketch text-base font-semibold" style={{ color: '#c62828' }}>Danger zone</h3>
+        <p className="mt-1 text-xs" style={{ color: 'rgba(198,40,40,0.8)' }}>
           Clear all locally stored DropTrack data and reseed the sample data.
           This cannot be undone.
         </p>
         <button
           type="button"
           onClick={() => setPendingReset(true)}
-          className="mt-3 rounded-md border border-red-500/40 bg-red-600/80 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/60"
+          className="sketchy-btn mt-3"
+          style={{ background: '#c62828', color: 'white', borderColor: '#c62828' }}
         >
           Clear all data
         </button>

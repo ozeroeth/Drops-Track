@@ -5,30 +5,30 @@ export default function DeadlineLabel({ iso, label = 'Deadline' }) {
   const days = daysUntil(iso);
   const formatted = formatDate(iso);
 
-  let urgencyClass = 'text-slate-300 border-slate-500/30 bg-slate-500/10';
+  let urgencyClass = 'text-[var(--text-muted)] border-[var(--text-muted)] bg-transparent';
   let urgencyText = '\u2014';
 
   if (days === null) {
     urgencyText = '\u2014';
   } else if (isPast(iso)) {
-    urgencyClass = 'text-red-300 border-red-500/30 bg-red-500/10';
+    urgencyClass = 'text-[#c62828] border-[#c62828] bg-[rgba(198,40,40,0.1)]';
     urgencyText = 'Past';
   } else if (isExpiringSoon(iso)) {
-    urgencyClass = 'text-orange-300 border-orange-500/30 bg-orange-500/10';
+    urgencyClass = 'text-[#f57c00] border-[#f57c00] bg-[rgba(245,124,0,0.1)]';
     urgencyText = `${days}d left`;
   } else {
-    urgencyClass = 'text-slate-300 border-slate-500/30 bg-slate-500/10';
+    urgencyClass = 'text-[var(--text-muted)] border-[var(--text-muted)] bg-transparent';
     urgencyText = `${days}d left`;
   }
 
   return (
     <div className="flex flex-col gap-0.5 text-xs">
-      <span className="uppercase tracking-wide text-slate-500">{label}</span>
+      <span className="uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="flex items-center gap-2">
-        <span className="text-sm text-slate-200">{formatted}</span>
+        <span className="text-sm" style={{ color: 'var(--text)' }}>{formatted}</span>
         <span
           className={
-            'inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium ' +
+            'inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold font-sketch ' +
             urgencyClass
           }
         >

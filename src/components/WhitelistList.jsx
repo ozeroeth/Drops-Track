@@ -122,7 +122,7 @@ export default function WhitelistList({ whitelists, setWhitelists, wallets }) {
         <button
           type="button"
           onClick={() => setEditing('new')}
-          className="rounded-md border border-accent-500/40 bg-accent-500 px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-accent-400 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="sketchy-btn px-3 py-1.5 text-sm"
         >
           + Add Whitelist
         </button>

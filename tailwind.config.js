@@ -22,6 +22,10 @@ export default {
           900: '#064e3b',
         },
       },
+      fontFamily: {
+        sketch: ['Caveat', 'cursive'],
+        body: ['Nunito', 'sans-serif'],
+      },
     },
   },
   plugins: [],

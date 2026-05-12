@@ -24,39 +24,30 @@ function networkLabel(id) {
 }
 
 function SummaryCard({ title, value, hint, onClick }) {
-  const base =
-    'rounded-lg border border-surface2 bg-surface p-4 text-left transition-colors';
-  const interactive = onClick
-    ? ' hover:border-accent-500/60 hover:bg-surface2 focus:outline-none focus:ring-2 focus:ring-accent-500/40'
-    : '';
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={base + interactive}
+      className="sketchy-card p-4 text-left"
     >
-      <p className="text-xs uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-50">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-slate-500">{hint}</p> : null}
+      <p className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>{title}</p>
+      <p className="mt-1 font-sketch text-2xl font-bold" style={{ color: 'var(--text)' }}>{value}</p>
+      {hint ? <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p> : null}
     </Tag>
   );
 }
 
 function UpcomingItem({ title, subtitle, iso, label, highlight }) {
-  const borderClass = highlight
-    ? 'border-orange-500/60'
-    : 'border-surface2';
+  const borderStyle = highlight ? { borderColor: '#f57c00' } : {};
   return (
     <li
-      className={
-        'flex items-center justify-between gap-3 rounded-md border bg-surface/60 px-3 py-2 ' +
-        borderClass
-      }
+      className="sketchy-card flex items-center justify-between gap-3 px-3 py-2"
+      style={{ ...borderStyle, boxShadow: '2px 2px 0 var(--shadow)', borderWidth: '2px' }}
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-slate-100">{title}</p>
-        <div className="mt-0.5 text-xs text-slate-400">{subtitle}</div>
+        <p className="truncate text-sm font-medium" style={{ color: 'var(--text)' }}>{title}</p>
+        <div className="mt-0.5 text-xs" style={{ color: 'var(--text-muted)' }}>{subtitle}</div>
       </div>
       <DeadlineLabel iso={iso} label={label} />
     </li>
@@ -161,15 +152,16 @@ export default function Dashboard({
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
+        <section className="sketchy-card p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-100">
+            <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>
               Upcoming Airdrop Deadlines
             </h3>
             <button
               type="button"
               onClick={onJumpToAirdrops}
-              className="text-xs text-accent-400 hover:text-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="text-xs font-sketch font-semibold"
+              style={{ color: 'var(--accent)' }}
             >
               View all
             </button>
@@ -200,15 +192,16 @@ export default function Dashboard({
           )}
         </section>
 
-        <section className="rounded-lg border border-surface2 bg-surface p-4">
+        <section className="sketchy-card p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-100">
+            <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>
               Upcoming Whitelist Mints
             </h3>
             <button
               type="button"
               onClick={onJumpToWhitelists}
-              className="text-xs text-accent-400 hover:text-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+              className="text-xs font-sketch font-semibold"
+              style={{ color: 'var(--accent)' }}
             >
               View all
             </button>
