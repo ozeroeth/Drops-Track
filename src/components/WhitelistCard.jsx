@@ -16,25 +16,19 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
     (whitelist.status === 'Applied' || whitelist.status === 'Whitelisted');
   const soon = isExpiringSoon(primaryIso) && !overdue;
 
-  let borderClass = 'border-surface2';
-  if (overdue) borderClass = 'border-red-500/70';
-  else if (soon) borderClass = 'border-orange-500/70';
+  let borderStyle = {};
+  if (overdue) borderStyle = { borderColor: '#c62828' };
+  else if (soon) borderStyle = { borderColor: '#f57c00' };
 
   return (
-    <article
-      className={
-        'flex flex-col gap-3 rounded-lg border bg-surface p-4 ' + borderClass
-      }
-    >
+    <article className="sketch-card flex flex-col gap-3 p-4" style={borderStyle}>
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold text-slate-50">
+          <h3 className="truncate font-sketch text-xl font-bold" style={{ color: 'var(--text)' }}>
             {whitelist.name}
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-md border border-surface2 bg-surface2 px-2 py-0.5 text-xs text-slate-300">
-              {whitelist.type}
-            </span>
+            <span className="sketch-chip">{whitelist.type}</span>
             <StatusBadge status={whitelist.status} />
           </div>
         </div>
@@ -42,14 +36,14 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
           <button
             type="button"
             onClick={() => onEdit(whitelist)}
-            className="rounded-md border border-surface2 bg-surface2 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+            className="sketch-btn sketch-btn-ghost px-2 py-1 text-xs"
           >
             Edit
           </button>
           <button
             type="button"
             onClick={() => onDelete(whitelist)}
-            className="rounded-md border border-red-500/40 bg-red-500/10 px-2 py-1 text-xs text-red-300 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400/60"
+            className="sketch-btn sketch-btn-danger px-2 py-1 text-xs"
           >
             Delete
           </button>
@@ -63,23 +57,23 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
 
       <div className="grid grid-cols-2 gap-3 text-xs">
         <div>
-          <div className="uppercase tracking-wide text-slate-500">Wallet</div>
-          <div className="text-slate-300">
+          <div className="uppercase tracking-wide font-bold" style={{ color: 'var(--text-muted)' }}>Wallet</div>
+          <div style={{ color: 'var(--text)' }}>
             {wallet ? (
               <span>
                 {wallet.label}{' '}
-                <span className="text-slate-500" title={wallet.address}>
+                <span style={{ color: 'var(--text-muted)' }} title={wallet.address}>
                   ({truncateAddress(wallet.address)})
                 </span>
               </span>
             ) : (
-              <span className="italic text-slate-500">Unassigned</span>
+              <span className="italic" style={{ color: 'var(--text-muted)' }}>Unassigned</span>
             )}
           </div>
         </div>
         <div>
-          <div className="uppercase tracking-wide text-slate-500">Mint price</div>
-          <div className="text-slate-300">
+          <div className="uppercase tracking-wide font-bold" style={{ color: 'var(--text-muted)' }}>Mint price</div>
+          <div style={{ color: 'var(--text)' }}>
             {whitelist.mintPrice || '\u2014'}
           </div>
         </div>
@@ -87,8 +81,9 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
 
       {whitelist.notes ? (
         <p
-          className="text-xs text-slate-400"
+          className="text-xs"
           style={{
+            color: 'var(--text-muted)',
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
@@ -104,7 +99,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
           href={whitelist.link}
           target="_blank"
           rel="noreferrer"
-          className="text-xs font-medium text-accent-400 hover:text-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="sketch-link text-xs"
         >
           Open official site
         </a>

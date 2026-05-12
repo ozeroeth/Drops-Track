@@ -2,13 +2,13 @@ import React from 'react';
 
 function Select({ value, onChange, options, label }) {
   return (
-    <label className="flex items-center gap-2 text-xs text-slate-400">
+    <label className="flex items-center gap-2 text-xs">
       <span className="sr-only">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
-        className="rounded-md border border-surface2 bg-surface px-2 py-1.5 text-sm text-slate-100 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+        className="sketch-select px-2 py-1.5 text-sm"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -74,7 +74,7 @@ export default function FilterBar({ filters, setFilters, options, defaults }) {
         <button
           type="button"
           onClick={clearAll}
-          className="rounded-md border border-surface2 bg-surface px-2 py-1.5 text-xs text-slate-300 hover:bg-surface2 focus:outline-none focus:ring-2 focus:ring-accent-500/40"
+          className="sketch-btn sketch-btn-ghost px-2 py-1.5 text-xs"
         >
           Clear filters
         </button>

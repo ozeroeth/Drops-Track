@@ -12,6 +12,7 @@ import AirdropList from './components/AirdropList.jsx';
 import WhitelistList from './components/WhitelistList.jsx';
 import WalletManager from './components/WalletManager.jsx';
 import DataManager from './components/DataManager.jsx';
+import CrayonCharacter from './components/CrayonCharacter.jsx';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -21,8 +22,47 @@ const TABS = [
   { id: 'data', label: 'Data' },
 ];
 
+function SunIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  );
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem('droptrack-theme');
+    if (saved === 'dark') return true;
+    if (saved === 'light') return false;
+    return true;
+  });
+
+  useEffect(() => {
+    if (dark) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+    localStorage.setItem('droptrack-theme', dark ? 'dark' : 'light');
+  }, [dark]);
 
   const [airdrops, setAirdrops] = useLocalStorageState(
     STORAGE_KEYS.airdrops,
@@ -48,15 +88,33 @@ export default function App() {
   }, [setAirdrops, setWhitelists, setWallets]);
 
   return (
-    <div className="min-h-screen bg-bg text-slate-100">
-      <header className="sticky top-0 z-20 border-b border-surface2 bg-surface/95 backdrop-blur">
+    <div className="relative min-h-screen font-body">
+      {/* SVG Rough Filter */}
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <defs>
+          <filter id="rough-filter">
+            <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="2" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </defs>
+      </svg>
+
+      <CrayonCharacter />
+
+      <header className="sticky top-0 z-20" style={{ backgroundColor: 'var(--surface)', borderBottom: '2.5px solid var(--border)' }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-accent-400" />
-            <span>
-              <span className="text-accent-400">Drop</span>Track
-            </span>
+          <h1 className="font-sketch text-[26px] font-bold tracking-tight">
+            <span style={{ color: 'var(--accent)' }}>Drop</span>
+            <span style={{ color: 'var(--text)' }}>Track</span>
           </h1>
+          <button
+            type="button"
+            onClick={() => setDark((d) => !d)}
+            className="sketch-toggle"
+            aria-label="Toggle dark mode"
+          >
+            {dark ? <SunIcon /> : <MoonIcon />}
+          </button>
         </div>
         <nav
           className="mx-auto flex max-w-6xl gap-1 overflow-x-auto whitespace-nowrap px-4 pb-3"
@@ -70,12 +128,7 @@ export default function App() {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={
-                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent-500/40 ' +
-                  (isActive
-                    ? 'bg-accent-500 text-slate-900'
-                    : 'text-slate-300 hover:bg-surface2 hover:text-slate-100')
-                }
+                className={'sketch-nav-item' + (isActive ? ' active' : '')}
               >
                 {tab.label}
               </button>
@@ -83,7 +136,7 @@ export default function App() {
           })}
         </nav>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="relative z-10 mx-auto max-w-6xl px-4 py-6">
         {activeTab === 'dashboard' ? (
           <Dashboard
             airdrops={airdrops}
