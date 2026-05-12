@@ -1,0 +1,24 @@
+# DropTrack Supabase project config.
+#
+# This file is read by the Supabase CLI (`supabase functions deploy`) and
+# controls per-function settings that would otherwise default to the most
+# restrictive value.
+#
+# verify_jwt = false on check-deadlines
+# -------------------------------------
+# check-deadlines is invoked by a scheduled cron job from Supabase Database
+# > Cron Jobs, not by an authenticated user. Without this override the
+# platform would reject every cron call with 401 Unauthorized unless the
+# cron manually supplied an Authorization: Bearer <service_role_key>
+# header. The function itself already uses the service role key internally
+# for its DB queries, so no auth is lost by flipping this flag.
+#
+# send-test-notification is intentionally left at the default (verify_jwt
+# = true) because it runs under the caller's JWT and uses that identity to
+# look up the caller's own chat id.
+
+[functions.check-deadlines]
+verify_jwt = false
+
+[functions.send-test-notification]
+verify_jwt = true

@@ -14,13 +14,21 @@ function startOfDay(date) {
   return d;
 }
 
-export function formatDate(iso) {
-  const d = parseISODate(iso);
-  if (!d) return '\u2014';
+export function todayIsoLocal() {
+  const d = new Date();
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+export function formatDate(iso) {
+  const d = parseISODate(iso);
+  if (!d) return '\u2014';
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  const day = d.getDate();
+  const year = d.getFullYear();
+  return `${month} ${day}, ${year}`;
 }
 
 export function daysUntil(iso) {
