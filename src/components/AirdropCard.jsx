@@ -78,12 +78,12 @@ export default function AirdropCard({
             </div>
           )}
           <div className="min-w-0">
-            <h3 className="truncate font-sketch text-lg font-semibold" style={{ color: 'var(--text)' }}>
+            <h3 className="truncate text-lg font-semibold" style={{ color: 'var(--text)' }}>
               {airdrop.name}
             </h3>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <span
-                className="inline-flex items-center rounded-full border-2 px-2 py-0.5 font-sketch text-sm"
+                className="inline-flex items-center rounded-full border-2 px-2 py-0.5 text-sm"
                 style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
               >
                 {networkLabel(airdrop.network)}
@@ -118,7 +118,7 @@ export default function AirdropCard({
           <span className="uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
             Est. value
           </span>
-          <span className="font-sketch text-base font-bold" style={{ color: 'var(--text)' }}>
+          <span className="text-base font-bold" style={{ color: 'var(--text)' }}>
             {formatUsd(airdrop.estimatedValueUsd)}
           </span>
         </div>
@@ -183,7 +183,7 @@ export default function AirdropCard({
           href={airdrop.link}
           target="_blank"
           rel="noreferrer"
-          className="text-xs font-sketch font-semibold"
+          className="text-xs font-semibold"
           style={{ color: 'var(--accent)' }}
         >
           Open official site

@@ -32,11 +32,11 @@ function WalletCard({ wallet, airdropCount, whitelistCount, onEdit, onDelete }) 
     <article className="sketchy-card flex flex-col gap-3 p-4">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate font-sketch text-lg font-semibold" style={{ color: 'var(--text)' }}>
+          <h3 className="truncate text-lg font-semibold" style={{ color: 'var(--text)' }}>
             {wallet.label}
           </h3>
           <span
-            className="mt-1 inline-flex items-center rounded-full border-2 px-2 py-0.5 font-sketch text-sm"
+            className="mt-1 inline-flex items-center rounded-full border-2 px-2 py-0.5 text-sm"
             style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
           >
             {wallet.chainType}
@@ -142,7 +142,7 @@ export default function WalletManager({ wallets, setWallets, airdrops, whitelist
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-sketch text-lg font-semibold" style={{ color: 'var(--text)' }}>Wallets</h2>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Wallets</h2>
         <button
           type="button"
           onClick={() => setEditing('new')}

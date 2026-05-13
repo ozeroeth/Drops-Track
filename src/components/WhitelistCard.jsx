@@ -27,12 +27,12 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
     >
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate font-sketch text-lg font-semibold" style={{ color: 'var(--text)' }}>
+          <h3 className="truncate text-lg font-semibold" style={{ color: 'var(--text)' }}>
             {whitelist.name}
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span
-              className="inline-flex items-center rounded-full border-2 px-2 py-0.5 font-sketch text-sm"
+              className="inline-flex items-center rounded-full border-2 px-2 py-0.5 text-sm"
               style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
             >
               {whitelist.type}
@@ -109,7 +109,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete }) {
           href={whitelist.link}
           target="_blank"
           rel="noreferrer"
-          className="text-xs font-sketch font-semibold"
+          className="text-xs font-semibold"
           style={{ color: 'var(--accent)' }}
         >
           Open official site

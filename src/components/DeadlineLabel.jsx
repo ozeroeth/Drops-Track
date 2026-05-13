@@ -28,7 +28,7 @@ export default function DeadlineLabel({ iso, label = 'Deadline' }) {
         <span className="text-sm" style={{ color: 'var(--text)' }}>{formatted}</span>
         <span
           className={
-            'inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold font-sketch ' +
+            'inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold ' +
             urgencyClass
           }
         >

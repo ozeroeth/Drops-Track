@@ -5,20 +5,6 @@ import Toast from './Toast.jsx';
 
 const DAYS_OPTIONS = [1, 2, 3, 5, 7];
 
-const inputClass =
-  'w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60';
-
-const inputStyle = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.08)',
-};
-
-const glassStyle = {
-  background: 'rgba(13,17,23,0.85)',
-  border: '1px solid rgba(255,255,255,0.06)',
-  backdropFilter: 'blur(12px)',
-};
-
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
 
@@ -139,23 +125,24 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl p-5" style={glassStyle}>
-        <h2 className="text-lg font-semibold text-white">
+      <section className="sketchy-card p-5">
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
           Telegram notifications
         </h2>
-        <p className="mt-2 text-sm text-textSecondary">
-          Search <span className="font-mono text-white/80">@DropTrackBot</span>{' '}
-          on Telegram, send <span className="font-mono text-white/80">/start</span>,
+        <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+          Search <span className="font-mono" style={{ color: 'var(--text)' }}>@DropTrackBot</span>{' '}
+          on Telegram, send <span className="font-mono" style={{ color: 'var(--text)' }}>/start</span>,
           and paste your Chat ID below. If the bot is not yet deployed, you can
           get your chat id from{' '}
-          <span className="font-mono text-white/80">@userinfobot</span>.
+          <span className="font-mono" style={{ color: 'var(--text)' }}>@userinfobot</span>.
         </p>
 
         <form onSubmit={handleSave} className="mt-5 space-y-4">
           <div>
             <label
               htmlFor="settings-chat-id"
-              className="mb-1 block text-xs font-medium text-textSecondary"
+              className="mb-1 block text-xs font-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Chat ID
             </label>
@@ -168,8 +155,7 @@ export default function SettingsPage() {
               onChange={(e) => setChatId(e.target.value)}
               placeholder="e.g. 123456789"
               disabled={loading || saving}
-              className={inputClass}
-              style={inputStyle}
+              className="sketchy-input w-full px-3 py-2 text-sm"
             />
           </div>
 
@@ -180,11 +166,12 @@ export default function SettingsPage() {
               checked={enabled}
               onChange={(e) => setEnabled(e.target.checked)}
               disabled={loading || saving}
-              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-surfaceBorder bg-surface text-primary accent-primary focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-0.5 h-4 w-4 cursor-pointer rounded disabled:cursor-not-allowed disabled:opacity-60"
             />
             <label
               htmlFor="settings-enabled"
-              className="cursor-pointer select-none text-sm text-white/90"
+              className="cursor-pointer select-none text-sm"
+              style={{ color: 'var(--text)' }}
             >
               Enable deadline notifications
             </label>
@@ -193,7 +180,8 @@ export default function SettingsPage() {
           <div>
             <label
               htmlFor="settings-days-before"
-              className="mb-1 block text-xs font-medium text-textSecondary"
+              className="mb-1 block text-xs font-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Notify X days before deadline
             </label>
@@ -202,8 +190,7 @@ export default function SettingsPage() {
               value={daysBefore}
               onChange={(e) => setDaysBefore(Number(e.target.value))}
               disabled={loading || saving}
-              className={inputClass + ' sm:w-48'}
-              style={inputStyle}
+              className="sketchy-input w-full sm:w-48 px-3 py-2 text-sm"
             >
               {DAYS_OPTIONS.map((n) => (
                 <option key={n} value={n}>
@@ -217,10 +204,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={loading || saving}
-              className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
-              style={{
-                background: 'linear-gradient(135deg, #F7931A, #E8820A)',
-              }}
+              className="sketchy-btn px-4 py-1.5 text-sm"
             >
               {saving ? 'Saving...' : 'Save'}
             </button>
@@ -228,7 +212,7 @@ export default function SettingsPage() {
               type="button"
               onClick={handleSendTest}
               disabled={loading || saving || testing}
-              className="rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm font-medium text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="sketchy-btn-ghost px-3 py-1.5 text-sm"
             >
               {testing ? 'Sending...' : 'Send test notification'}
             </button>
@@ -236,16 +220,16 @@ export default function SettingsPage() {
         </form>
       </section>
 
-      <section className="rounded-2xl p-5" style={glassStyle}>
-        <h2 className="text-lg font-semibold text-white">Account</h2>
-        <p className="mt-2 text-sm text-textSecondary">
+      <section className="sketchy-card p-5">
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Account</h2>
+        <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
           Sign out of this device. Your data stays safe in Supabase and will be
           here when you sign back in.
         </p>
         <button
           type="button"
           onClick={handleSignOut}
-          className="mt-4 rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm font-medium text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="sketchy-btn-ghost mt-4 px-3 py-1.5 text-sm"
         >
           Sign out
         </button>

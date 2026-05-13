@@ -171,7 +171,7 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
     <div className="sketchy-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>{title}</h3>
+          <h3 className="text-base font-semibold" style={{ color: 'var(--text)' }}>{title}</h3>
           <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{description}</p>
           {importMessage ? (
             <p className="mt-2 text-xs" style={{ color: 'var(--text)' }}>{importMessage}</p>
@@ -318,7 +318,7 @@ export default function DataManager({
       />
 
       <div className="sketchy-card p-4" style={{ borderColor: '#c62828' }}>
-        <h3 className="font-sketch text-base font-semibold" style={{ color: '#c62828' }}>Danger zone</h3>
+        <h3 className="text-base font-semibold" style={{ color: '#c62828' }}>Danger zone</h3>
         <p className="mt-1 text-xs" style={{ color: 'rgba(198,40,40,0.8)' }}>
           Clear all locally stored DropTrack data and reseed the sample data.
           This cannot be undone.

@@ -39,14 +39,15 @@ export default function MobileMoreMenu({ open, onClose, activeTab, onSelect, tab
         aria-label="More navigation"
         className="fixed inset-x-0 bottom-0 z-50 animate-slide-up pb-[env(safe-area-inset-bottom)] sm:hidden"
         style={{
-          background: '#0D1117',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--surface)',
+          borderTop: '2.5px solid var(--border)',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
         }}
       >
         <div
-          className="mx-auto my-3 h-1 w-10 rounded-full bg-white/15"
+          className="mx-auto my-3 h-1 w-10 rounded-full"
+          style={{ background: 'var(--text-muted)', opacity: 0.5 }}
           aria-hidden="true"
         />
         {tabs.map((tab, idx) => {
@@ -63,11 +64,9 @@ export default function MobileMoreMenu({ open, onClose, activeTab, onSelect, tab
               }}
               aria-current={isActive ? 'page' : undefined}
               className={
-                'flex w-full items-center gap-3 px-5 py-3.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 ' +
-                (isActive
-                  ? 'bg-white/5 text-[#F7931A]'
-                  : 'text-white hover:bg-white/5')
+                'flex w-full items-center gap-3 px-5 py-3.5 text-sm transition-colors focus:outline-none'
               }
+              style={isActive ? { background: 'var(--surface)', color: 'var(--accent)' } : { color: 'var(--text)' }}
             >
               <Icon size={20} />
               <span>{tab.label}</span>

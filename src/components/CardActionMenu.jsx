@@ -48,7 +48,8 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
         type="button"
         ref={triggerRef}
         onClick={() => setOpen((prev) => !prev)}
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#8892A4] transition-colors hover:text-white focus:outline-none"
+        className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:opacity-80 focus:outline-none"
+        style={{ color: 'var(--text-muted)' }}
         aria-label="Actions"
         aria-haspopup="true"
         aria-expanded={open}
@@ -58,18 +59,15 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-[10px] py-1 shadow-xl"
-          style={{
-            background: '#1C2333',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
+          className="sketchy-card absolute right-0 top-full z-50 mt-1 min-w-[140px] py-1 shadow-xl"
         >
           <button
             type="button"
             ref={firstItemRef}
             role="menuitem"
             onClick={() => handleAction(onEdit)}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:opacity-80"
+            style={{ color: 'var(--text)' }}
           >
             <span>{'\u270F\uFE0F'}</span>
             <span>Edit</span>
@@ -78,7 +76,8 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
             type="button"
             role="menuitem"
             onClick={() => handleAction(onDuplicate)}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:opacity-80"
+            style={{ color: 'var(--text)' }}
           >
             <span>{'\u{1F4CB}'}</span>
             <span>Duplicate</span>
@@ -87,7 +86,7 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
             type="button"
             role="menuitem"
             onClick={() => handleAction(onDelete)}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-white/5"
+            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:opacity-80"
             style={{ color: '#FF4757' }}
           >
             <span>{'\u{1F5D1}\uFE0F'}</span>

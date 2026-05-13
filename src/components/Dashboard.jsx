@@ -32,7 +32,7 @@ function SummaryCard({ title, value, hint, onClick }) {
       className="sketchy-card p-4 text-left"
     >
       <p className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>{title}</p>
-      <p className="mt-1 font-sketch text-2xl font-bold" style={{ color: 'var(--text)' }}>{value}</p>
+      <p className="mt-1 text-2xl font-bold" style={{ color: 'var(--text)' }}>{value}</p>
       {hint ? <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p> : null}
     </Tag>
   );
@@ -154,13 +154,13 @@ export default function Dashboard({
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="sketchy-card p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>
+            <h3 className="text-base font-semibold" style={{ color: 'var(--text)' }}>
               Upcoming Airdrop Deadlines
             </h3>
             <button
               type="button"
               onClick={onJumpToAirdrops}
-              className="text-xs font-sketch font-semibold"
+              className="text-xs font-semibold"
               style={{ color: 'var(--accent)' }}
             >
               View all
@@ -194,13 +194,13 @@ export default function Dashboard({
 
         <section className="sketchy-card p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-sketch text-base font-semibold" style={{ color: 'var(--text)' }}>
+            <h3 className="text-base font-semibold" style={{ color: 'var(--text)' }}>
               Upcoming Whitelist Mints
             </h3>
             <button
               type="button"
               onClick={onJumpToWhitelists}
-              className="text-xs font-sketch font-semibold"
+              className="text-xs font-semibold"
               style={{ color: 'var(--accent)' }}
             >
               View all

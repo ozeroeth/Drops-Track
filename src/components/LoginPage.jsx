@@ -107,22 +107,16 @@ export default function LoginPage() {
     <div className="relative flex min-h-screen items-center justify-center px-4 py-10">
       <BackgroundDecoration />
       <div
-        className="relative z-10 w-full max-w-[420px] rounded-2xl p-8"
-        style={{
-          background: 'rgba(13,17,23,0.85)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-        }}
+        className="sketchy-card relative z-10 w-full max-w-[420px] p-8"
       >
         <div className="mb-6 flex flex-col items-center text-center">
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight font-heading">
-            <span className="text-primary">&#9670;</span>
+          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+            <span style={{ color: 'var(--accent)' }}>&#9670;</span>
             <span>
-              <span className="text-primary">Drop</span><span className="text-white">Track</span>
+              <span style={{ color: 'var(--accent)' }}>Drop</span><span style={{ color: 'var(--text)' }}>Track</span>
             </span>
           </h1>
-          <p className="mt-2 text-sm text-textSecondary">
+          <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
             Track your airdrops. Never miss a drop.
           </p>
         </div>
@@ -131,25 +125,24 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogle}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-[0_0_20px_rgba(247,147,26,0.3)] focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-          style={{
-            background: 'linear-gradient(135deg, #F7931A, #E8820A)',
-          }}
+          className="sketchy-btn w-full px-3 py-2.5 text-sm"
+          style={{ background: 'var(--accent)', color: 'white' }}
         >
           Continue with Google
         </button>
 
-        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-textSecondary">
-          <span className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
+        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+          <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
           <span>or continue with</span>
-          <span className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label
               htmlFor="login-email"
-              className="mb-1 block text-xs font-medium text-slate-300"
+              className="mb-1 block text-xs font-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Email
             </label>
@@ -159,18 +152,15 @@ export default function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-[10px] px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-primary/40"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
+              className="sketchy-input w-full px-3 py-2 text-sm"
               required
             />
           </div>
           <div>
             <label
               htmlFor="login-password"
-              className="mb-1 block text-xs font-medium text-slate-300"
+              className="mb-1 block text-xs font-medium"
+              style={{ color: 'var(--text-muted)' }}
             >
               Password
             </label>
@@ -182,23 +172,19 @@ export default function LoginPage() {
               }
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-[10px] px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-primary/40"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
+              className="sketchy-input w-full px-3 py-2 text-sm"
               required
               minLength={6}
             />
           </div>
 
           {errorMsg ? (
-            <p className="text-sm text-danger" role="alert">
+            <p className="text-sm" style={{ color: '#c62828' }} role="alert">
               {errorMsg}
             </p>
           ) : null}
           {infoMsg ? (
-            <p className="text-sm text-primary" role="status">
+            <p className="text-sm" style={{ color: 'var(--accent)' }} role="status">
               {infoMsg}
             </p>
           ) : null}
@@ -206,21 +192,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-[10px] px-3 py-2 text-sm font-semibold text-white transition-colors hover:border-[rgba(255,255,255,0.2)] focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.12)',
-            }}
+            className="sketchy-btn-ghost w-full px-3 py-2 text-sm"
           >
             {busy ? 'Please wait...' : submitLabel}
           </button>
         </form>
 
-        <div className="mt-4 flex flex-col items-center gap-2 text-xs text-textSecondary">
+        <div className="mt-4 flex flex-col items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
           <button
             type="button"
             onClick={toggleMode}
-            className="text-slate-300 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="focus:outline-none"
+            style={{ color: 'var(--text-muted)' }}
           >
             {mode === 'login'
               ? "Don't have an account? Sign up"
@@ -229,13 +212,14 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleForgotPassword}
-            className="text-textSecondary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="focus:outline-none"
+            style={{ color: 'var(--text-muted)' }}
           >
             Forgot password?
           </button>
         </div>
 
-        <p className="mt-6 text-center text-xs text-textSecondary">
+        <p className="mt-6 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
           Powered by Supabase
         </p>
       </div>

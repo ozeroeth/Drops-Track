@@ -36,7 +36,7 @@ export default function Modal({ open, onClose, title, children, widthClass = 'ma
       >
         {title ? (
           <div className="flex items-center justify-between gap-3 px-5 py-3" style={{ borderBottom: '2.5px solid var(--border)' }}>
-            <h2 className="font-sketch text-lg font-semibold" style={{ color: 'var(--text)' }}>{title}</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>{title}</h2>
             <button
               type="button"
               onClick={() => {
