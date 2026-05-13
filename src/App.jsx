@@ -9,6 +9,7 @@ import Calendar from './components/Calendar.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import SettingsPage from './components/SettingsPage.jsx';
 import BackgroundDecoration from './components/BackgroundDecoration.jsx';
+import CrayonCharacter from './components/CrayonCharacter';
 import { useAuth } from './contexts/AuthContext.jsx';
 import useSupabaseCollection from './hooks/useSupabaseCollection.js';
 import {
@@ -54,6 +55,12 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [moreOpen, setMoreOpen] = useState(false);
+
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('droptrack-theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   const enabled = !!user;
   const userId = user?.id || null;
@@ -118,6 +125,12 @@ export default function App() {
       .catch(() => {});
   }, [userId, airdropsMeta, whitelistsMeta, walletsMeta]);
 
+  useEffect(() => {
+    if (isDark) { document.body.classList.add('dark'); }
+    else { document.body.classList.remove('dark'); }
+    localStorage.setItem('droptrack-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
   async function handleForceReseed() {
     // DataManager has already called forceSeedSampleData(user.id) directly;
     // this callback exists so App can re-pull the authoritative rows after
@@ -148,23 +161,16 @@ export default function App() {
     airdropsMeta.loading || whitelistsMeta.loading || walletsMeta.loading;
 
   return (
-    <div className="relative min-h-screen text-slate-100">
+    <div className="relative min-h-screen" style={{color:'var(--text)'}}>
       <BackgroundDecoration />
+      <CrayonCharacter />
       <header
         className="sticky top-0 z-20"
-        style={{
-          background: 'transparent',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
+        style={{ borderBottom: '2.5px solid var(--border)', background: 'var(--surface)' }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4">
-          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight font-heading">
-            <span className="text-primary">&#9670;</span>
-            <span>
-              <span className="text-primary">Drop</span><span className="text-white">Track</span>
-            </span>
+          <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
+            <span style={{color:'var(--accent)',fontWeight:700}}>Drop</span><span style={{color:'var(--text)',fontWeight:700}}>Track</span>
           </h1>
           <div className="flex items-center gap-2">
             {syncing ? (
@@ -184,9 +190,21 @@ export default function App() {
               </span>
             ) : null}
             <button
+              onClick={() => setIsDark(!isDark)}
+              className="sketchy-btn-ghost"
+              style={{ padding: '6px 10px', color: 'var(--text)', background: 'var(--surface)' }}
+              aria-label="Toggle theme"
+            >
+              {isDark ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              )}
+            </button>
+            <button
               type="button"
               onClick={() => signOut()}
-              className="rounded-md border border-[rgba(255,255,255,0.12)] bg-transparent px-3 py-1.5 text-xs font-medium text-textSecondary transition-colors hover:border-[rgba(255,255,255,0.3)] hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="sketchy-btn-ghost" style={{ padding: '6px 12px', color: 'var(--text-muted)', background: 'var(--surface)' }}
             >
               Sign out
             </button>
@@ -206,11 +224,10 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
                 className={
-                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 ' +
-                  (isActive
-                    ? 'text-primary'
-                    : 'text-textSecondary hover:text-white')
+                  'sketchy-nav rounded-md px-3 py-1.5 text-sm' +
+                  (isActive ? ' font-bold' : '')
                 }
+                style={{color: isActive ? 'var(--accent)' : 'var(--text-muted)'}}
               >
                 {tab.label}
               </button>

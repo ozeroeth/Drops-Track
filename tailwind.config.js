@@ -18,8 +18,7 @@ export default {
         textSecondary: '#8892A4',
       },
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         fadeInUp: {

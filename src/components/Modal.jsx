@@ -30,30 +30,26 @@ export default function Modal({ open, onClose, title, children, widthClass = 'ma
     >
       <div
         className={
-          'w-full ' +
+          'sketchy-card w-full ' +
           widthClass +
           ' rounded-2xl shadow-2xl'
         }
-        style={{
-          background: 'rgba(13,17,23,0.95)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-        }}
+        style={{background:'var(--surface)'}}
       >
         {title ? (
           <div
             className="flex items-center justify-between gap-3 px-6 py-4"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+            style={{borderBottom: '2px solid var(--border)'}}
           >
-            <h2 className="text-base font-semibold text-white">{title}</h2>
+            <h2 className="text-base font-semibold" style={{color:'var(--text)'}}>{title}</h2>
             <button
               type="button"
               onClick={() => {
                 if (typeof onClose === 'function') onClose();
               }}
               aria-label="Close dialog"
-              className="flex h-7 w-7 flex-none items-center justify-center rounded-lg text-textSecondary transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="flex h-7 w-7 flex-none items-center justify-center rounded-lg transition-colors hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/40"
+              style={{color:'var(--text-muted)'}}
             >
               <span aria-hidden="true" className="text-lg leading-none">&times;</span>
             </button>

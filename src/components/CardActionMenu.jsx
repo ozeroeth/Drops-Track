@@ -58,18 +58,15 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-[10px] py-1 shadow-xl"
-          style={{
-            background: '#1C2333',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
+          className="sketchy-card absolute right-0 top-full z-50 mt-1 min-w-[140px] rounded-[10px] py-1 shadow-xl"
         >
           <button
             type="button"
             ref={firstItemRef}
             role="menuitem"
             onClick={() => handleAction(onEdit)}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-white/5"
+            style={{color:'var(--text)'}}
           >
             <span>{'\u270F\uFE0F'}</span>
             <span>Edit</span>
@@ -78,7 +75,8 @@ export default function CardActionMenu({ onEdit, onDuplicate, onDelete }) {
             type="button"
             role="menuitem"
             onClick={() => handleAction(onDuplicate)}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/5"
+            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-white/5"
+            style={{color:'var(--text)'}}
           >
             <span>{'\u{1F4CB}'}</span>
             <span>Duplicate</span>

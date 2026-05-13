@@ -32,20 +32,15 @@ function SummaryCard({ title, value, hint, onClick, accentIndex }) {
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className="relative rounded-2xl p-5 text-left transition-all duration-200 hover:-translate-y-0.5"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(12px)',
-        borderLeft: `3px solid ${accent.color}`,
-      }}
+      className="sketchy-card relative rounded-2xl p-5 text-left transition-all duration-200 hover:-translate-y-0.5"
+      style={{borderLeft: `3px solid ${accent.color}`}}
     >
-      <p className="text-xs uppercase tracking-wide text-textSecondary">
+      <p className="text-xs uppercase tracking-wide" style={{color:'var(--text-muted)'}}>
         <span className="mr-1.5">{accent.emoji}</span>
         {title}
       </p>
-      <p className="mt-1 font-heading text-3xl font-bold text-white">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-textSecondary">{hint}</p> : null}
+      <p className="mt-1 text-3xl font-bold" style={{color:'var(--text)'}}>{value}</p>
+      {hint ? <p className="mt-1 text-xs" style={{color:'var(--text-muted)'}}>{hint}</p> : null}
     </Tag>
   );
 }
@@ -54,14 +49,13 @@ function UpcomingItem({ title, subtitle, iso, label, highlight }) {
   return (
     <li
       className={
-        'flex items-center justify-between gap-3 rounded-xl border px-3 py-2 ' +
-        (highlight ? 'border-primary/40' : 'border-surfaceBorder')
+        'sketchy-card flex items-center justify-between gap-3 rounded-xl border px-3 py-2 ' +
+        (highlight ? 'border-primary/40' : '')
       }
-      style={{ background: 'rgba(13,17,23,0.6)' }}
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-white">{title}</p>
-        <div className="mt-0.5 text-xs text-textSecondary">{subtitle}</div>
+        <p className="truncate text-sm font-medium" style={{color:'var(--text)'}}>{title}</p>
+        <div className="mt-0.5 text-xs" style={{color:'var(--text-muted)'}}>{subtitle}</div>
       </div>
       <DeadlineLabel iso={iso} label={label} />
     </li>
@@ -171,15 +165,10 @@ export default function Dashboard({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section
-          className="rounded-2xl p-5"
-          style={{
-            background: 'rgba(13,17,23,0.85)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(12px)',
-          }}
+          className="sketchy-card rounded-2xl p-5"
         >
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
               Upcoming Airdrop Deadlines
             </h3>
             <button
@@ -217,15 +206,10 @@ export default function Dashboard({
         </section>
 
         <section
-          className="rounded-2xl p-5"
-          style={{
-            background: 'rgba(13,17,23,0.85)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(12px)',
-          }}
+          className="sketchy-card rounded-2xl p-5"
         >
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
               Upcoming Whitelist Mints
             </h3>
             <button

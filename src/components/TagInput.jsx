@@ -87,11 +87,8 @@ export default function TagInput({
         }}
         placeholder="Add a tag and press Enter"
         maxLength={MAX_TAG_LENGTH}
-        className="w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40"
-        style={{
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.08)',
-        }}
+        className="sketchy-input w-full text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40"
+        style={{}}
       />
       {availableSuggestions.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
@@ -100,8 +97,8 @@ export default function TagInput({
               key={s}
               type="button"
               onClick={() => commit(s)}
-              className="inline-flex items-center rounded-full border border-surfaceBorder px-2 py-0.5 text-xs text-textSecondary transition-colors hover:border-primary/40 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
-              style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+              className="sketchy-btn-ghost inline-flex items-center rounded-full px-2 py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+              style={{color:'var(--text-muted)'}}
             >
               + {s}
             </button>

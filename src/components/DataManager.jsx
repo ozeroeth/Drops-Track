@@ -190,19 +190,14 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
   const inputRef = useRef(null);
   return (
     <div
-      className="rounded-2xl p-5"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(12px)',
-      }}
+      className="sketchy-card rounded-2xl p-5"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-white">{title}</h3>
-          <p className="mt-1 text-xs text-textSecondary">{description}</p>
+          <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>{title}</h3>
+          <p className="mt-1 text-xs" style={{color:'var(--text-muted)'}}>{description}</p>
           {importMessage ? (
-            <p className="mt-2 text-xs text-white/80">{importMessage}</p>
+            <p className="mt-2 text-xs" style={{color:'var(--text)'}}>{importMessage}</p>
           ) : null}
         </div>
         <div className="flex flex-none flex-wrap gap-2">
@@ -210,7 +205,8 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
             type="button"
             onClick={onExport}
             disabled={exporting}
-            className="rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+            className="sketchy-btn-ghost rounded-lg px-3 py-1.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+            style={{color:'var(--text-muted)'}}
           >
             Export CSV
           </button>
@@ -228,11 +224,8 @@ function Row({ title, description, onExport, onImport, exporting, importMessage 
           <button
             type="button"
             onClick={() => inputRef.current && inputRef.current.click()}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/40"
-            style={{
-              backgroundColor: 'rgba(247,147,26,0.15)',
-              border: '1px solid rgba(247,147,26,0.3)',
-            }}
+            className="sketchy-btn rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+            style={{background:'var(--accent)', color:'white'}}
           >
             Import CSV
           </button>
@@ -365,7 +358,7 @@ export default function DataManager({
       />
 
       <div
-        className="rounded-2xl p-5"
+        className="sketchy-card rounded-2xl p-5"
         style={{
           border: '1px solid rgba(255,71,87,0.3)',
           backgroundColor: 'rgba(255,71,87,0.05)',

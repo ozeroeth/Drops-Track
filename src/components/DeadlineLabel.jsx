@@ -49,9 +49,9 @@ export default function DeadlineLabel({ iso, label = 'Deadline' }) {
 
   return (
     <div className="flex flex-col gap-0.5 text-xs">
-      <span className="uppercase tracking-wide text-textSecondary">{label}</span>
+      <span className="uppercase tracking-wide" style={{color:'var(--text-muted)'}}>{label}</span>
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-white/90">{formatted}</span>
+        <span className="text-sm" style={{color:'var(--text)'}}>{formatted}</span>
         {pill}
       </div>
     </div>

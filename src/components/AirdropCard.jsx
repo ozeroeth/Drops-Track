@@ -70,25 +70,15 @@ export default function AirdropCard({
 
   return (
     <article
-      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: soon
-          ? '1px solid rgba(247,147,26,0.3)'
-          : '1px solid rgba(255,255,255,0.06)',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(12px)',
-        borderLeft: soon ? '3px solid #FF4757' : undefined,
-      }}
+      className="sketchy-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
+      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined}}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'rgba(247,147,26,0.3)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(247,147,26,0.08)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = soon
-          ? 'rgba(247,147,26,0.3)'
-          : 'rgba(255,255,255,0.06)';
-        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.borderColor = '';
+        e.currentTarget.style.boxShadow = '';
       }}
     >
       <header className="relative flex items-start justify-between gap-3">
@@ -97,16 +87,17 @@ export default function AirdropCard({
             <img
               src={airdrop.logoUrl}
               alt=""
-              className="h-10 w-10 flex-none rounded-full border border-surfaceBorder object-cover"
+              className="h-10 w-10 flex-none rounded-full object-cover"
+              style={{borderColor:'var(--border)'}}
               onError={() => setImgFailed(true)}
             />
           ) : (
-            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-surfaceBorder bg-surface text-sm font-semibold text-textSecondary">
+            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full text-sm font-semibold" style={{border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text-muted)'}}>
               {initials(airdrop.name)}
             </div>
           )}
           <div className="min-w-0">
-            <h3 className="text-base font-bold text-white max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none">
+            <h3 className="text-base font-bold max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none" style={{color:'var(--text)'}}>
               {airdrop.name}
             </h3>
             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -148,33 +139,33 @@ export default function AirdropCard({
       <div className="flex items-start justify-between gap-3 md:grid md:grid-cols-2 md:items-stretch">
         <DeadlineLabel iso={airdrop.deadline} label="Deadline" />
         <div className="flex flex-col gap-0.5 text-xs">
-          <span className="uppercase tracking-wide text-textSecondary">
+          <span className="uppercase tracking-wide" style={{color:'var(--text-muted)'}}>
             Est. value
           </span>
-          <span className="text-sm text-white">
+          <span className="text-sm" style={{color:'var(--text)'}}>
             {formatUsd(airdrop.estimatedValueUsd)}
           </span>
         </div>
       </div>
 
-      <div className="text-xs text-textSecondary">
-        <div className="uppercase tracking-wide text-textSecondary">Wallet</div>
-        <div className="text-white/80">
+      <div className="text-xs" style={{color:'var(--text-muted)'}}>
+        <div className="uppercase tracking-wide" style={{color:'var(--text-muted)'}}>Wallet</div>
+        <div style={{color:'var(--text)'}}>
           {wallet ? (
             <span>
               {wallet.label}{' '}
-              <span className="text-textSecondary" title={wallet.address}>
+              <span style={{color:'var(--text-muted)'}} title={wallet.address}>
                 ({truncateAddress(wallet.address)})
               </span>
             </span>
           ) : (
-            <span className="italic text-textSecondary">Unassigned</span>
+            <span className="italic" style={{color:'var(--text-muted)'}}>Unassigned</span>
           )}
         </div>
       </div>
 
       {airdrop.notes ? (
-        <p className="text-xs text-textSecondary line-clamp-2 md:line-clamp-3">
+        <p className="text-xs line-clamp-2 md:line-clamp-3" style={{color:'var(--text-muted)'}}>
           {airdrop.notes}
         </p>
       ) : null}
@@ -188,15 +179,17 @@ export default function AirdropCard({
                 type="checkbox"
                 checked={!!task.done}
                 onChange={() => onToggleTask(airdrop.id, task.id)}
-                className="mt-0.5 h-4 w-4 flex-none rounded border-surfaceBorder bg-surface text-primary focus:ring-2 focus:ring-primary/40"
+                className="mt-0.5 h-4 w-4 flex-none rounded text-primary focus:ring-2 focus:ring-primary/40"
+                style={{borderColor:'var(--border)', background:'var(--surface)'}}
               />
               <label
                 htmlFor={`task-${airdrop.id}-${task.id}`}
                 className={
                   task.done
-                    ? 'text-textSecondary line-through'
-                    : 'text-white/90'
+                    ? 'line-through'
+                    : ''
                 }
+                style={{color: task.done ? 'var(--text-muted)' : 'var(--text)'}}
               >
                 {task.label}
               </label>

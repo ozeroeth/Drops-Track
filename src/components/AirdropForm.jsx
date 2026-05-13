@@ -57,11 +57,10 @@ function fromInitial(initial) {
 }
 
 const inputClass =
-  'mt-1 w-full rounded-[10px] border px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
+  'sketchy-input mt-1 w-full text-sm';
 
 const inputStyle = {
-  background: 'rgba(255,255,255,0.04)',
-  borderColor: 'rgba(255,255,255,0.08)',
+  padding: '8px 12px',
 };
 
 export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
@@ -331,7 +330,8 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
               <button
                 type="button"
                 onClick={addTask}
-                className="rounded-[10px] border border-primary/40 bg-primary/20 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="sketchy-btn rounded-[10px] px-2 py-1 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                style={{background:'var(--accent)', color:'white'}}
               >
                 Add
               </button>
@@ -388,15 +388,15 @@ export default function AirdropForm({ initial, wallets, onSubmit, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border px-3 py-1.5 text-sm text-textSecondary transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/20"
-            style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'transparent' }}
+            className="sketchy-btn-ghost rounded-xl border px-3 py-1.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{color:'var(--text-muted)'}}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-[0_4px_20px_rgba(247,147,26,0.3)] focus:outline-none focus:ring-2 focus:ring-primary/20"
-            style={{ background: 'linear-gradient(135deg, #F7931A, #E8820A)' }}
+            className="sketchy-btn rounded-xl px-4 py-1.5 text-sm font-semibold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            style={{background:'var(--accent)', color:'white'}}
           >
             {isEdit ? 'Save changes' : 'Add airdrop'}
           </button>

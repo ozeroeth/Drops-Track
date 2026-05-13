@@ -19,11 +19,10 @@ function fromInitial(initial) {
 }
 
 const inputClass =
-  'mt-1 w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40';
+  'sketchy-input mt-1 w-full text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/40';
 
 const inputStyle = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  padding: '8px 12px',
 };
 
 export default function WalletForm({ initial, onSubmit, onCancel }) {
@@ -123,16 +122,15 @@ export default function WalletForm({ initial, onSubmit, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg border border-surfaceBorder px-3 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="sketchy-btn-ghost rounded-lg px-3 py-1.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+            style={{color:'var(--text-muted)'}}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-xl px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-200"
-            style={{
-              background: 'linear-gradient(135deg, #F7931A, #E8820A)',
-            }}
+            className="sketchy-btn rounded-xl px-4 py-1.5 text-sm font-semibold shadow-lg transition-all duration-200"
+            style={{background:'var(--accent)', color:'white'}}
           >
             {isEdit ? 'Save changes' : 'Add wallet'}
           </button>

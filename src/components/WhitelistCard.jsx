@@ -22,35 +22,26 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
 
   return (
     <article
-      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: soon
-          ? '1px solid rgba(247,147,26,0.3)'
-          : '1px solid rgba(255,255,255,0.06)',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(12px)',
-        borderLeft: soon ? '3px solid #FF4757' : undefined,
-      }}
+      className="sketchy-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
+      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined}}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'rgba(247,147,26,0.3)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(247,147,26,0.08)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = soon
-          ? 'rgba(247,147,26,0.3)'
-          : 'rgba(255,255,255,0.06)';
-        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.borderColor = '';
+        e.currentTarget.style.boxShadow = '';
       }}
     >
       <header className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-base font-bold text-white max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none">
+          <h3 className="text-base font-bold max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none" style={{color:'var(--text)'}}>
             {whitelist.name}
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <span
-              className="inline-flex items-center rounded-full border border-surfaceBorder px-2 py-0.5 text-xs text-textSecondary"
+              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+              style={{border:'1px solid var(--border)', color:'var(--text-muted)'}}
             >
               {whitelist.type}
             </span>
@@ -86,30 +77,30 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
 
       <div className="grid grid-cols-2 gap-3 text-xs">
         <div>
-          <div className="uppercase tracking-wide text-textSecondary">Wallet</div>
-          <div className="text-white/80">
+          <div className="uppercase tracking-wide" style={{color:'var(--text-muted)'}}>Wallet</div>
+          <div style={{color:'var(--text)'}}>
             {wallet ? (
               <span>
                 {wallet.label}{' '}
-                <span className="text-textSecondary" title={wallet.address}>
+                <span style={{color:'var(--text-muted)'}} title={wallet.address}>
                   ({truncateAddress(wallet.address)})
                 </span>
               </span>
             ) : (
-              <span className="italic text-textSecondary">Unassigned</span>
+              <span className="italic" style={{color:'var(--text-muted)'}}>Unassigned</span>
             )}
           </div>
         </div>
         <div>
-          <div className="uppercase tracking-wide text-textSecondary">Mint price</div>
-          <div className="text-white/80">
+          <div className="uppercase tracking-wide" style={{color:'var(--text-muted)'}}>Mint price</div>
+          <div style={{color:'var(--text)'}}>
             {whitelist.mintPrice || '\u2014'}
           </div>
         </div>
       </div>
 
       {whitelist.notes ? (
-        <p className="text-xs text-textSecondary line-clamp-2 md:line-clamp-3">
+        <p className="text-xs line-clamp-2 md:line-clamp-3" style={{color:'var(--text-muted)'}}>
           {whitelist.notes}
         </p>
       ) : null}

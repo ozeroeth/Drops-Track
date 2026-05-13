@@ -8,10 +8,7 @@ import {
 
 const CUSTOM_SENTINEL = '__custom__';
 
-const inputStyle = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.08)',
-};
+const inputStyle = {};
 
 export default function NetworkSelect({ id, value, onChange }) {
   const [customList, setCustomList] = useState(() => loadCustomNetworks());
@@ -104,7 +101,7 @@ export default function NetworkSelect({ id, value, onChange }) {
         id={id}
         value={selectValue || ''}
         onChange={handleSelectChange}
-        className="mt-1 w-full rounded-[10px] px-3 py-2 text-sm text-white focus:outline-none"
+        className="sketchy-input mt-1 w-full text-sm focus:outline-none"
         style={inputStyle}
         onFocus={handleFocus}
         onBlur={handleBlur}
@@ -135,7 +132,7 @@ export default function NetworkSelect({ id, value, onChange }) {
             onKeyDown={handleDraftKeyDown}
             placeholder="e.g. Berachain"
             autoFocus
-            className="flex-1 rounded-[10px] px-3 py-2 text-sm text-white placeholder-[#4A5568] focus:outline-none"
+            className="sketchy-input flex-1 text-sm placeholder-[#4A5568] focus:outline-none"
             style={inputStyle}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -143,10 +140,8 @@ export default function NetworkSelect({ id, value, onChange }) {
           <button
             type="button"
             onClick={commitDraft}
-            className="rounded-[10px] px-2 py-1 text-xs font-medium text-white transition-colors hover:shadow-[0_0_10px_rgba(247,147,26,0.2)] focus:outline-none focus:ring-2 focus:ring-primary/40"
-            style={{
-              background: 'linear-gradient(135deg, #F7931A, #E8820A)',
-            }}
+            className="sketchy-btn rounded-[10px] px-2 py-1 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
+            style={{background:'var(--accent)', color:'white'}}
           >
             Add
           </button>
@@ -156,7 +151,8 @@ export default function NetworkSelect({ id, value, onChange }) {
               setShowDraft(false);
               setDraft('');
             }}
-            className="rounded-[10px] border border-[rgba(255,255,255,0.12)] bg-transparent px-2 py-1 text-xs text-textSecondary transition-colors hover:border-[rgba(255,255,255,0.3)] hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="sketchy-btn-ghost rounded-[10px] px-2 py-1 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+            style={{color:'var(--text-muted)'}}
           >
             Cancel
           </button>

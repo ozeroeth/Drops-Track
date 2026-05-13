@@ -55,16 +55,11 @@ function monthKey(year, monthIndex) {
 function SummaryTile({ title, value, hint }) {
   return (
     <div
-      className="rounded-2xl p-5"
-      style={{
-        background: 'rgba(13,17,23,0.85)',
-        border: '1px solid rgba(255,255,255,0.06)',
-        backdropFilter: 'blur(12px)',
-      }}
+      className="sketchy-card rounded-2xl p-5"
     >
-      <p className="text-xs uppercase tracking-wide text-textSecondary">{title}</p>
-      <p className="mt-1 font-heading text-3xl font-bold text-white">{value}</p>
-      {hint ? <p className="mt-1 text-xs text-textSecondary">{hint}</p> : null}
+      <p className="text-xs uppercase tracking-wide" style={{color:'var(--text-muted)'}}>{title}</p>
+      <p className="mt-1 text-3xl font-bold" style={{color:'var(--text)'}}>{value}</p>
+      {hint ? <p className="mt-1 text-xs" style={{color:'var(--text-muted)'}}>{hint}</p> : null}
     </div>
   );
 }
@@ -76,12 +71,12 @@ function StatusRow({ status, count, total }) {
   return (
     <li className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-medium text-white">{status}</span>
-        <span className="text-textSecondary">
-          <span className="text-white">{count}</span>
-          <span className="mx-1 text-textSecondary">/</span>
+        <span className="font-medium" style={{color:'var(--text)'}}>{status}</span>
+        <span style={{color:'var(--text-muted)'}}>
+          <span style={{color:'var(--text)'}}>{count}</span>
+          <span className="mx-1" style={{color:'var(--text-muted)'}}>/</span>
           <span>{total}</span>
-          <span className="ml-2 text-textSecondary">{pctLabel}</span>
+          <span className="ml-2" style={{color:'var(--text-muted)'}}>{pctLabel}</span>
         </span>
       </div>
       <div
@@ -267,17 +262,13 @@ export default function Stats({ airdrops, whitelists, wallets }) {
     ? `${mostUsedWallet.count} entr${mostUsedWallet.count === 1 ? 'y' : 'ies'} across airdrops and whitelists`
     : 'No wallet usage recorded yet';
 
-  const glassSection = {
-    background: 'rgba(13,17,23,0.85)',
-    border: '1px solid rgba(255,255,255,0.06)',
-    backdropFilter: 'blur(12px)',
-  };
+  const glassSection = {};
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-white">Stats</h2>
-        <p className="text-xs text-textSecondary">
+        <h2 className="text-lg font-semibold" style={{color:'var(--text)'}}>Stats</h2>
+        <p className="text-xs" style={{color:'var(--text-muted)'}}>
           Read-only analytics across your tracked airdrops and whitelists.
         </p>
       </div>
@@ -310,33 +301,33 @@ export default function Stats({ airdrops, whitelists, wallets }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl p-5" style={glassSection}>
-          <h3 className="text-sm font-semibold text-white">
+        <section className="sketchy-card rounded-2xl p-5" style={glassSection}>
+          <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
             Best performing network
           </h3>
-          <p className="mt-2 font-heading text-3xl font-bold text-white">
+          <p className="mt-2 text-3xl font-bold" style={{color:'var(--text)'}}>
             {bestNetworkLabel}
           </p>
-          <p className="mt-1 text-xs text-textSecondary">{bestNetworkHint}</p>
+          <p className="mt-1 text-xs" style={{color:'var(--text-muted)'}}>{bestNetworkHint}</p>
         </section>
-        <section className="rounded-2xl p-5" style={glassSection}>
-          <h3 className="text-sm font-semibold text-white">
+        <section className="sketchy-card rounded-2xl p-5" style={glassSection}>
+          <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
             Most used wallet
           </h3>
-          <p className="mt-2 truncate font-heading text-3xl font-bold text-white">
+          <p className="mt-2 truncate text-3xl font-bold" style={{color:'var(--text)'}}>
             {mostUsedWalletLabel}
           </p>
-          <p className="mt-1 text-xs text-textSecondary">{mostUsedWalletHint}</p>
+          <p className="mt-1 text-xs" style={{color:'var(--text-muted)'}}>{mostUsedWalletHint}</p>
         </section>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="rounded-2xl p-5" style={glassSection}>
+        <section className="sketchy-card rounded-2xl p-5" style={glassSection}>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
               Airdrops by status
             </h3>
-            <span className="text-xs text-textSecondary">
+            <span className="text-xs" style={{color:'var(--text-muted)'}}>
               {safeAirdrops.length} total
             </span>
           </div>
@@ -359,12 +350,12 @@ export default function Stats({ airdrops, whitelists, wallets }) {
           )}
         </section>
 
-        <section className="rounded-2xl p-5" style={glassSection}>
+        <section className="sketchy-card rounded-2xl p-5" style={glassSection}>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
               Whitelists by status
             </h3>
-            <span className="text-xs text-textSecondary">
+            <span className="text-xs" style={{color:'var(--text-muted)'}}>
               {safeWhitelists.length} total
             </span>
           </div>
@@ -388,12 +379,12 @@ export default function Stats({ airdrops, whitelists, wallets }) {
         </section>
       </div>
 
-      <section className="rounded-2xl p-5" style={glassSection}>
+      <section className="sketchy-card rounded-2xl p-5" style={glassSection}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">
+          <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
             Monthly activity
           </h3>
-          <span className="text-xs text-textSecondary">
+          <span className="text-xs" style={{color:'var(--text-muted)'}}>
             Entries added per month, last 12 months
           </span>
         </div>

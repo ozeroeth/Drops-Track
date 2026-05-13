@@ -141,7 +141,7 @@ function KindLabel({ kind }) {
   if (kind === 'whitelist-apply') text = 'Whitelist apply';
   else if (kind === 'whitelist-mint') text = 'Whitelist mint';
   return (
-    <span className="inline-flex items-center rounded-full border border-surfaceBorder px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-textSecondary">
+    <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] uppercase tracking-wide" style={{border:'1px solid var(--border)', color:'var(--text-muted)'}}>
       {text}
     </span>
   );
@@ -209,24 +209,20 @@ export default function Calendar({ airdrops, whitelists }) {
   };
 
   const navButtonClass =
-    'inline-flex items-center justify-center rounded-lg border border-surfaceBorder px-2.5 py-1.5 text-sm text-textSecondary transition-colors hover:border-primary/40 hover:text-white focus:outline-none focus:ring-2 focus:ring-primary/40';
+    'sketchy-btn-ghost inline-flex items-center justify-center rounded-lg px-2.5 py-1.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40';
 
-  const glassStyle = {
-    background: 'rgba(13,17,23,0.85)',
-    border: '1px solid rgba(255,255,255,0.06)',
-    backdropFilter: 'blur(12px)',
-  };
+  const glassStyle = {};
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-white">Calendar</h2>
-        <p className="text-xs text-textSecondary">
+        <h2 className="text-lg font-semibold" style={{color:'var(--text)'}}>Calendar</h2>
+        <p className="text-xs" style={{color:'var(--text-muted)'}}>
           Airdrop deadlines and whitelist apply/mint dates laid out by day.
         </p>
       </div>
 
-      <section className="rounded-2xl p-5" style={glassStyle}>
+      <section className="sketchy-card rounded-2xl p-5" style={glassStyle}>
         <div className="mb-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <button
@@ -246,7 +242,7 @@ export default function Calendar({ airdrops, whitelists }) {
               &rarr;
             </button>
           </div>
-          <h3 className="text-sm font-semibold text-white sm:text-base">
+          <h3 className="text-sm font-semibold sm:text-base" style={{color:'var(--text)'}}>
             {monthTitle}
           </h3>
           <button
@@ -259,7 +255,7 @@ export default function Calendar({ airdrops, whitelists }) {
           </button>
         </div>
 
-        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-wide text-textSecondary">
+        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-wide" style={{color:'var(--text-muted)'}}>
           {WEEKDAYS.map((d) => (
             <div key={d} className="py-1">
               {d}
@@ -334,7 +330,7 @@ export default function Calendar({ airdrops, whitelists }) {
           })}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-wide text-textSecondary">
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-wide" style={{color:'var(--text-muted)'}}>
           <span className="inline-flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-danger" />
             Past
@@ -350,12 +346,12 @@ export default function Calendar({ airdrops, whitelists }) {
         </div>
       </section>
 
-      <section className="rounded-2xl p-5" style={glassStyle}>
+      <section className="sketchy-card rounded-2xl p-5" style={glassStyle}>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">
+          <h3 className="text-sm font-semibold" style={{color:'var(--text)'}}>
             Events on {formatDate(selectedIso)}
           </h3>
-          <span className="text-xs text-textSecondary">
+          <span className="text-xs" style={{color:'var(--text-muted)'}}>
             {selectedEvents.length} event
             {selectedEvents.length === 1 ? '' : 's'}
           </span>
@@ -370,14 +366,13 @@ export default function Calendar({ airdrops, whitelists }) {
             {selectedEvents.map((ev, idx) => (
               <li
                 key={`${ev.kind}-${ev.id}-${idx}`}
-                className="flex flex-col gap-2 rounded-xl border border-surfaceBorder px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
-                style={{ background: 'rgba(13,17,23,0.6)' }}
+                className="sketchy-card flex flex-col gap-2 rounded-xl px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-medium" style={{color:'var(--text)'}}>
                     {ev.name}
                   </p>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-textSecondary">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs" style={{color:'var(--text-muted)'}}>
                     <KindLabel kind={ev.kind} />
                     {ev.status ? <StatusBadge status={ev.status} /> : null}
                   </div>
