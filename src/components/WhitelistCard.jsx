@@ -1,10 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import CardActionMenu from './CardActionMenu.jsx';
 import TagChip from './TagChip.jsx';
 import { Globe, TwitterX } from './icons.jsx';
 import { isExpiringSoon, isPast, daysUntil, primaryWhitelistDeadline } from '../utils/date.js';
+
+function initials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
 
 function truncateAddress(addr) {
   if (!addr || typeof addr !== 'string') return '';
@@ -23,6 +30,12 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
   const [cardHeight, setCardHeight] = useState(null);
   const [isResizing, setIsResizing] = useState(false);
   const cardRef = useRef(null);
+
+  const [imgFailed, setImgFailed] = useState(false);
+
+  useEffect(() => {
+    setImgFailed(false);
+  }, [whitelist.logoUrl]);
 
   const handleResizeStart = (e) => {
     e.preventDefault();
@@ -65,23 +78,38 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
       }}
     >
       <header className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-base font-bold max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none" style={{color:'var(--text)'}}>
-            {whitelist.name}
-          </h3>
-          <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span
-              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
-              style={{border:'1px solid var(--border)', color:'var(--text-muted)'}}
-            >
-              {whitelist.type}
-            </span>
-            <StatusBadge status={whitelist.status} />
-            {soon && dLeft !== null ? (
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: 'rgba(255,71,87,0.15)', color: '#FF4757' }}>
-                {'\u{1F525}'} {dLeft}d left
+        <div className="flex min-w-0 items-center gap-3">
+          {whitelist.logoUrl && !imgFailed ? (
+            <img
+              src={whitelist.logoUrl}
+              alt=""
+              className="h-10 w-10 flex-none rounded-full object-cover"
+              style={{borderColor:'var(--border)'}}
+              onError={() => setImgFailed(true)}
+            />
+          ) : (
+            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full text-sm font-semibold" style={{border:'1px solid var(--border)', background:'var(--surface)', color:'var(--text-muted)'}}>
+              {initials(whitelist.name)}
+            </div>
+          )}
+          <div className="min-w-0">
+            <h3 className="text-base font-bold max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none" style={{color:'var(--text)'}}>
+              {whitelist.name}
+            </h3>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span
+                className="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+                style={{border:'1px solid var(--border)', color:'var(--text-muted)'}}
+              >
+                {whitelist.type}
               </span>
-            ) : null}
+              <StatusBadge status={whitelist.status} />
+              {soon && dLeft !== null ? (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: 'rgba(255,71,87,0.15)', color: '#FF4757' }}>
+                  {'\u{1F525}'} {dLeft}d left
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
         <div className="absolute top-0 right-0 flex-none md:static">
