@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import CardActionMenu from './CardActionMenu.jsx';
@@ -58,6 +58,9 @@ export default function AirdropCard({
   onToggleTask,
 }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const [cardHeight, setCardHeight] = useState(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const cardRef = useRef(null);
   useEffect(() => {
     setImgFailed(false);
   }, [airdrop.logoUrl]);
@@ -68,10 +71,37 @@ export default function AirdropCard({
   const networkColor = getNetworkColor(airdrop.network);
   const dLeft = daysUntil(airdrop.deadline);
 
+  const handleResizeStart = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    const startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    const startHeight = cardRef.current.offsetHeight;
+
+    const handleMove = (moveEvent) => {
+      const currentY = moveEvent.type === 'touchmove' ? moveEvent.touches[0].clientY : moveEvent.clientY;
+      const newHeight = Math.max(120, Math.min(800, startHeight + (currentY - startY)));
+      setCardHeight(newHeight);
+    };
+
+    const handleEnd = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+  };
+
   return (
     <article
+      ref={cardRef}
       className="sketchy-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
-      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined}}
+      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined, height: cardHeight ? `${cardHeight}px` : 'auto', overflow: 'hidden', transition: isResizing ? 'none' : 'height 0.2s ease', willChange: isResizing ? 'height' : undefined}}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'rgba(247,147,26,0.3)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(247,147,26,0.08)';
@@ -226,6 +256,25 @@ export default function AirdropCard({
           ) : null}
         </div>
       ) : null}
+
+      <div
+        onMouseDown={handleResizeStart}
+        onTouchStart={handleResizeStart}
+        style={{
+          height: '20px',
+          cursor: 'row-resize',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          touchAction: 'none',
+          userSelect: 'none',
+          opacity: 0.4,
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.4'; }}
+      >
+        <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'var(--border)' }} />
+      </div>
     </article>
   );
 }

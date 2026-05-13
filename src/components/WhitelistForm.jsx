@@ -9,6 +9,7 @@ function emptyEntry() {
   return {
     id: '',
     name: '',
+    logoUrl: '',
     type: WHITELIST_TYPES[0] || 'NFT mint',
     status: 'Applied',
     applicationDeadline: '',
@@ -28,6 +29,7 @@ function fromInitial(initial) {
   return {
     id: initial.id || '',
     name: initial.name || '',
+    logoUrl: initial.logoUrl || '',
     type: initial.type || WHITELIST_TYPES[0] || 'NFT mint',
     status: initial.status || 'Applied',
     applicationDeadline: initial.applicationDeadline || '',
@@ -76,6 +78,7 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
     const entry = {
       id: form.id || generateId(),
       name,
+      logoUrl: form.logoUrl.trim(),
       type: form.type,
       status: form.status,
       applicationDeadline: form.applicationDeadline || '',
@@ -110,6 +113,20 @@ export default function WhitelistForm({ initial, wallets, onSubmit, onCancel }) 
             autoFocus
           />
           {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-textSecondary" htmlFor="wf-logo">
+            Logo URL
+          </label>
+          <input
+            id="wf-logo"
+            type="url"
+            value={form.logoUrl}
+            onChange={(e) => update('logoUrl', e.target.value)}
+            className={inputClass}
+            style={inputStyle}
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

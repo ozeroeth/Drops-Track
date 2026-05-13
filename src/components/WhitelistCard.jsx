@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import CardActionMenu from './CardActionMenu.jsx';
@@ -20,10 +20,41 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
   const soon = isExpiringSoon(primaryIso) && !overdue;
   const dLeft = daysUntil(primaryIso);
 
+  const [cardHeight, setCardHeight] = useState(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const cardRef = useRef(null);
+
+  const handleResizeStart = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    const startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    const startHeight = cardRef.current.offsetHeight;
+
+    const handleMove = (moveEvent) => {
+      const currentY = moveEvent.type === 'touchmove' ? moveEvent.touches[0].clientY : moveEvent.clientY;
+      const newHeight = Math.max(120, Math.min(800, startHeight + (currentY - startY)));
+      setCardHeight(newHeight);
+    };
+
+    const handleEnd = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+  };
+
   return (
     <article
+      ref={cardRef}
       className="sketchy-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
-      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined}}
+      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined, height: cardHeight ? `${cardHeight}px` : 'auto', overflow: 'hidden', transition: isResizing ? 'none' : 'height 0.2s ease', willChange: isResizing ? 'height' : undefined}}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'rgba(247,147,26,0.3)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(247,147,26,0.08)';
@@ -70,8 +101,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
         </div>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3">
-        <DeadlineLabel iso={whitelist.applicationDeadline} label="Apply by" />
+      <div>
         <DeadlineLabel iso={whitelist.mintDate} label="Mint" />
       </div>
 
@@ -133,6 +163,25 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
           ) : null}
         </div>
       ) : null}
+
+      <div
+        onMouseDown={handleResizeStart}
+        onTouchStart={handleResizeStart}
+        style={{
+          height: '20px',
+          cursor: 'row-resize',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          touchAction: 'none',
+          userSelect: 'none',
+          opacity: 0.4,
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.4'; }}
+      >
+        <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'var(--border)' }} />
+      </div>
     </article>
   );
 }

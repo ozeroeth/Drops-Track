@@ -170,6 +170,14 @@ export default function App() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4">
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
+            <svg viewBox="0 0 400 320" width="28" height="28" style={{marginRight:'6px'}}>
+              <ellipse cx="200" cy="180" rx="90" ry="100" fill="#f5c5a3" stroke="var(--border)" strokeWidth="7"/>
+              <ellipse cx="160" cy="170" rx="22" ry="23" fill="white" stroke="var(--border)" strokeWidth="5"/>
+              <circle cx="160" cy="170" r="9" fill="var(--border)"/>
+              <ellipse cx="240" cy="170" rx="22" ry="23" fill="white" stroke="var(--border)" strokeWidth="5"/>
+              <circle cx="240" cy="170" r="9" fill="var(--border)"/>
+              <path d="M168 230 C180 242 220 242 232 230" stroke="var(--border)" strokeWidth="5" strokeLinecap="round" fill="none"/>
+            </svg>
             <span style={{color:'var(--accent)',fontWeight:700}}>Drop</span><span style={{color:'var(--text)',fontWeight:700}}>Track</span>
           </h1>
           <div className="flex items-center gap-2">
