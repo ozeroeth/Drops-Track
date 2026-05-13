@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import StatusBadge from './StatusBadge.jsx';
 import DeadlineLabel from './DeadlineLabel.jsx';
 import CardActionMenu from './CardActionMenu.jsx';
@@ -27,9 +27,7 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
   const soon = isExpiringSoon(primaryIso) && !overdue;
   const dLeft = daysUntil(primaryIso);
 
-  const [cardHeight, setCardHeight] = useState(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const cardRef = useRef(null);
+  const [collapsed, setCollapsed] = useState(false);
 
   const [imgFailed, setImgFailed] = useState(false);
 
@@ -37,37 +35,15 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
     setImgFailed(false);
   }, [whitelist.logoUrl]);
 
-  const handleResizeStart = (e) => {
-    e.preventDefault();
-    setIsResizing(true);
-    const startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-    const startHeight = cardRef.current.offsetHeight;
-
-    const handleMove = (moveEvent) => {
-      const currentY = moveEvent.type === 'touchmove' ? moveEvent.touches[0].clientY : moveEvent.clientY;
-      const newHeight = Math.max(120, Math.min(800, startHeight + (currentY - startY)));
-      setCardHeight(newHeight);
-    };
-
-    const handleEnd = () => {
-      setIsResizing(false);
-      document.removeEventListener('mousemove', handleMove);
-      document.removeEventListener('mouseup', handleEnd);
-      document.removeEventListener('touchmove', handleMove);
-      document.removeEventListener('touchend', handleEnd);
-    };
-
-    document.addEventListener('mousemove', handleMove);
-    document.addEventListener('mouseup', handleEnd);
-    document.addEventListener('touchmove', handleMove, { passive: false });
-    document.addEventListener('touchend', handleEnd);
-  };
-
   return (
     <article
-      ref={cardRef}
-      className="sketchy-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl p-4 md:p-5 transition-all duration-200"
-      style={{borderLeft: soon ? '3px solid var(--accent)' : undefined, height: cardHeight ? `${cardHeight}px` : 'auto', overflow: 'hidden', transition: isResizing ? 'none' : 'height 0.2s ease', willChange: isResizing ? 'height' : undefined}}
+      className="sketchy-card group relative flex flex-col gap-3 rounded-2xl p-4 md:p-5 transition-all duration-200"
+      style={{
+        borderLeft: soon ? '3px solid var(--accent)' : undefined,
+        maxHeight: collapsed ? '120px' : '1000px',
+        overflow: 'hidden',
+        transition: 'max-height 0.3s ease',
+      }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'rgba(247,147,26,0.3)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(247,147,26,0.08)';
@@ -96,23 +72,43 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
             <h3 className="text-base font-bold max-w-[calc(100%-48px)] truncate md:font-semibold md:max-w-none" style={{color:'var(--text)'}}>
               {whitelist.name}
             </h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2">
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
               <span
-                className="inline-flex items-center rounded-full px-2 py-0.5 text-xs"
+                className="whitespace-nowrap inline-flex items-center rounded-full px-2 py-0.5 text-xs"
                 style={{border:'1px solid var(--border)', color:'var(--text-muted)'}}
               >
                 {whitelist.type}
               </span>
               <StatusBadge status={whitelist.status} />
               {soon && dLeft !== null ? (
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: 'rgba(255,71,87,0.15)', color: '#FF4757' }}>
+                <span className="whitespace-nowrap inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: 'rgba(255,71,87,0.15)', color: '#FF4757' }}>
                   {'\u{1F525}'} {dLeft}d left
                 </span>
               ) : null}
             </div>
           </div>
         </div>
-        <div className="absolute top-0 right-0 flex-none md:static">
+        <div className="absolute top-0 right-0 flex-none md:static flex items-center gap-1">
+          <button
+            onClick={() => setCollapsed(c => !c)}
+            aria-label={collapsed ? 'Expand card' : 'Collapse card'}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.3s ease',
+              transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+              color: 'var(--text-muted)',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
           <CardActionMenu
             onEdit={() => onEdit(whitelist)}
             onDuplicate={() => onDuplicate && onDuplicate(whitelist)}
@@ -191,25 +187,6 @@ export default function WhitelistCard({ whitelist, wallet, onEdit, onDelete, onD
           ) : null}
         </div>
       ) : null}
-
-      <div
-        onMouseDown={handleResizeStart}
-        onTouchStart={handleResizeStart}
-        style={{
-          height: '20px',
-          cursor: 'row-resize',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          touchAction: 'none',
-          userSelect: 'none',
-          opacity: 0.4,
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.4'; }}
-      >
-        <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'var(--border)' }} />
-      </div>
     </article>
   );
 }
