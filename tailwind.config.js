@@ -18,8 +18,7 @@ export default {
         textSecondary: '#8892A4',
       },
       fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         fadeInUp: {
@@ -50,10 +49,6 @@ export default {
         'pulse-ring': 'pulseRing 1.5s ease-out infinite',
         shimmer: 'shimmer 2s ease-in-out infinite',
         'orb-pulse': 'orbPulse 4s ease-in-out infinite',
-      },
-      fontFamily: {
-        sketch: ['Caveat', 'cursive'],
-        body: ['Nunito', 'sans-serif'],
       },
     },
   },

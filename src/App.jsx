@@ -68,13 +68,13 @@ export default function App() {
       <CrayonCharacter />
       <header className="sticky top-0 z-20" style={{ borderBottom: '2.5px solid var(--border)', background: 'var(--surface)' }}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <h1 className="font-sketch text-2xl font-bold">
+          <h1 className="text-2xl font-bold">
             <span style={{ color: 'var(--accent)' }}>Drop</span>
             <span style={{ color: 'var(--text)' }}>Track</span>
           </h1>
           <button
             onClick={() => setIsDark(!isDark)}
-            className="sketchy-btn"
+            className="sketchy-btn-ghost"
             style={{ padding: '8px 12px', background: 'var(--surface)', color: 'var(--text)' }}
             aria-label="Toggle theme"
           >
@@ -112,10 +112,13 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
                 className={
-                  'sketchy-nav-item px-3 py-1.5' +
-                  (isActive ? ' active' : '')
+                  'sketchy-nav px-3 py-1.5' +
+                  (isActive ? '' : '')
                 }
-                style={{ color: isActive ? 'var(--accent)' : 'var(--text)' }}
+                style={{
+                  color: isActive ? 'var(--accent)' : 'var(--text)',
+                  borderBottom: isActive ? '2.5px solid var(--accent)' : 'none',
+                }}
               >
                 {tab.label}
               </button>
